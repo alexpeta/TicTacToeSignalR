@@ -1,0 +1,169 @@
+﻿@model TicTacToeSignalR.ViewModel.GameViewModel
+@using TicTacToeSignalR.ExtensionMethods
+@{
+    ViewBag.Title = "Index";
+}
+<style type="text/css">
+    .gameplace {
+        float:left;
+        width:400px;
+    }
+    .summary {
+        float:left;
+        width:400px;
+        border:0.5px dotted black;    
+    }
+    .board-wrapper {
+        width:100%;
+    }
+    
+    table.board {
+        width:360px;
+        padding:0px;
+        margin:0px;
+        border:1px solid black;
+        border-collapse:collapse;
+    }
+    table.board td {
+        padding:0px;
+        margin:0px;
+        border:1px solid black;
+    }
+    table.board a.tile {
+        width:120px;
+        height:120px;
+        display:block;
+    }
+    table.board a.selectedo,
+    table.board a.o:hover {
+       background-image:url("../../Content/themes/base/images/o.png");
+       background-position:center center;
+       background-repeat : no-repeat;
+    }
+    table.board a.selectedx,
+     table.board a.x:hover {
+       background-image:url("../../Content/themes/base/images/x.png");
+       background-position:center center;
+       background-repeat : no-repeat;
+    }
+    table.board a.invalid {
+        cursor:not-allowed;
+    }
+
+    #lobby {
+        margin-left:auto;
+        margin-right:auto;
+    }
+    #lobby .left-side {
+        width:400px;
+        float:left;
+        border:1px solid blue;
+    }
+    #lobby .right-side {
+        width:100px;
+        float:left;
+        border:1px solid red;
+    }
+
+
+    #lobby .left-side ul{
+        list-style-type:none;
+        padding:0px;
+        margin:0px;
+    }
+    #lobby .left-side ul li a {
+        display:block;
+        text-align:right;
+        text-decoration: none;
+        font-family:Tahoma;
+        font-size:18px;
+    }
+    
+</style>
+
+
+<div id="lobby-wrapper">
+    <div id="lobby">
+        <div class="left-side">
+            <ul>
+                @foreach(var p in Model.AllPlayers){
+                    <li><a href="#" class="player" data-id="">@p.Nick</a></li>
+                }
+            </ul>
+        </div>
+        <div style="clear:left;"></div>
+    </div>
+</div>
+
+
+
+
+<h2> (X) vs (O)</h2>
+<div class="board-wrapper">
+    <div class="gameplace">
+        @Html.RenderBoard(Model,'x')
+    </div>
+    <div class="summary">        
+    </div>
+    <div style="clear:both;"></div>
+    <button type="button" id="trigger">Send request</button>
+</div>
+
+
+<script type="text/javascript">
+    $(function () {
+        $('.tile[data-allowed="True"]').click(function () {
+            var self = $(this);
+            //this should be a Movement object in c#
+            var data = {
+                xPosition: self.attr('data-x'),
+                yPosition: self.attr('data-y'),
+                PieceType: 'x'
+            };
+
+            //call SignalR to update game
+        });
+
+        $('.player').click(function () {
+            $.post("/game/invite",
+                   { id : "alexpeta" },
+                   function (data) {
+                       alert("Data Loaded: " + data);
+                   });
+        });
+    });
+</script>
+
+<script type="text/javascript">
+    $(function () {
+        var proxy = $.connection.gameHub;
+
+        proxy.state.name = '@TempData["nickname"]';
+
+        proxy.client.appendSummary = function (data) {
+            $('.summary').append('<div>' + data + '</div>');
+        }
+
+        proxy.client.updateSummary = function (data) {
+            $('.summary > div').remove();
+
+            $.each(data, function () {
+                $('.summary').append('<div>' + this + '</div>');
+            });
+        };
+
+
+        $("#trigger").click(function () {
+            proxy.server.getConnectedPlayers(); //.updateGameMoves();
+        });
+
+        $.connection.hub.start().done(function () {
+            //proxy.state.id = $.connection.gameHub.connection.id;
+            //proxy.server.getConnectedPlayers();
+            proxy.server.playerJoined();
+        })
+        .fail(function () {
+            alert('failed to load signalr');
+        });
+    });
+</script>

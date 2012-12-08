@@ -1,0 +1,51 @@
+﻿@model string
+@{
+    ViewBag.Title = "Welcome";
+}
+
+@section featured {
+    <section class="featured">
+        <div class="content-wrapper">
+            <hgroup class="title">
+                <h1>@ViewBag.Title.</h1>
+                <h2>@ViewBag.Message</h2>
+            </hgroup>
+            <p>
+                
+            </p>
+        </div>
+    </section>
+}
+<h3>Start playing right away just after a couple of easy steps:</h3>
+<ol class="round">
+    <li class="one">
+        <h5>Set your nick and visit the lobby </h5>
+        <br />
+        @using (Html.BeginForm("Index","Home",FormMethod.Post,null))
+        {
+            <input type="text" name="nickname" id="nickname" style="width:250px;padding:3px;" value="@ViewBag.Nickname"/>
+            <input type="submit" value="Go!" />
+        }
+    </li>
+    <li class="two">
+        <h5>Invite to play</h5>
+        Click on a player name in the lobby to send an invitation to a game.
+    </li>
+    <li class="three">
+        <h5>Count the victories</h5>
+        Enjoy the game, and don't forget to give feedback!
+        </li>
+</ol>
+
+
+@*
+<script type="text/javascript">
+    $(function () {
+        var gameContextHub = $.connection.gameContext;
+        
+        // Start the connection and request current state
+        $.connection.hub.start();
+    });
+</script>
+
+*@

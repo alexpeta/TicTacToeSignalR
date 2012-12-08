@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="TicTacToeModel" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+  <EntityContainer Name="TicTacToeEntities1" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="Games" EntityType="TicTacToeModel.Game" />
+    <EntitySet Name="Movements" EntityType="TicTacToeModel.Movement" />
+    <EntitySet Name="Players" EntityType="TicTacToeModel.Player" />
+    <AssociationSet Name="FK_Movement_Game" Association="TicTacToeModel.FK_Movement_Game">
+      <End Role="Game" EntitySet="Games" />
+      <End Role="Movement" EntitySet="Movements" />
+    </AssociationSet>
+  </EntityContainer>
+  <EntityType Name="Game">
+    <Key>
+      <PropertyRef Name="GameId" />
+    </Key>
+    <Property Name="GameId" Type="Guid" Nullable="false" />
+    <Property Name="Duration" Type="Int32" Nullable="false" />
+    <Property Name="Player1" Type="Guid" Nullable="false" />
+    <Property Name="Player2" Type="Guid" Nullable="false" />
+    <Property Name="P1Piece" Type="String" Nullable="false" MaxLength="1" Unicode="false" FixedLength="true" />
+    <Property Name="P2Piece" Type="String" Nullable="false" MaxLength="1" Unicode="false" FixedLength="true" />
+    <Property Name="IsFinished" Type="Boolean" Nullable="false" />
+    <NavigationProperty Name="Movements" Relationship="TicTacToeModel.FK_Movement_Game" FromRole="Game" ToRole="Movement" />
+  </EntityType>
+  <EntityType Name="Movement">
+    <Key>
+      <PropertyRef Name="MovementId" />
+    </Key>
+    <Property Name="MovementId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="GameId" Type="Guid" Nullable="false" />
+    <NavigationProperty Name="Game" Relationship="TicTacToeModel.FK_Movement_Game" FromRole="Movement" ToRole="Game" />
+  </EntityType>
+  <EntityType Name="Player">
+    <Key>
+      <PropertyRef Name="PlayerId" />
+    </Key>
+    <Property Name="PlayerId" Type="Guid" Nullable="false" />
+    <Property Name="Nick" Type="String" Nullable="false" MaxLength="200" Unicode="true" FixedLength="false" />
+  </EntityType>
+  <Association Name="FK_Movement_Game">
+    <End Role="Game" Type="TicTacToeModel.Game" Multiplicity="1">
+      <OnDelete Action="Cascade" />
+    </End>
+    <End Role="Movement" Type="TicTacToeModel.Movement" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Game">
+        <PropertyRef Name="GameId" />
+      </Principal>
+      <Dependent Role="Movement">
+        <PropertyRef Name="GameId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+</Schema>
