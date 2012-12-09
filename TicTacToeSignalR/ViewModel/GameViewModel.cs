@@ -19,8 +19,9 @@ namespace TicTacToeSignalR.ViewModel
             set { _allPlayers = value; }
         }
 
-        public GameViewModel()
+        public GameViewModel() : base(null,null)
         {
+                
         }
         
     }

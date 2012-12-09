@@ -150,6 +150,7 @@
     <Compile Include="Core\Abstract\IBaseRepository.cs" />
     <Compile Include="Core\Abstract\IPlayerRepository.cs" />
     <Compile Include="Core\Entities\Game.cs" />
+    <Compile Include="Core\Entities\Invitation.cs" />
     <Compile Include="Core\Entities\Movement.cs" />
     <Compile Include="Core\Entities\Player.cs" />
     <Compile Include="Core\Mechanics\GameContext.cs" />

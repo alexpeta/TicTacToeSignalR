@@ -16,6 +16,7 @@ namespace TicTacToeSignalR
         private char _p1Piece;
         private char _p2Piece;
         private char[,] _board;
+        private List<Movement> _moves;
         #endregion
 
         public Guid GameId
@@ -48,12 +49,18 @@ namespace TicTacToeSignalR
             get { return _board; }
             set { _board = value; }
         }
+        public List<Movement> Moves
+        {
+            get { return _moves; }
+            set { _moves = value; }
+        }
 
-
-        public Game()
+        public Game(Player p1, Player p2)
         {
             Board = new char[Game.Dimension, Game.Dimension];
-            //FillBoard();
+            Player1 = p1;
+            Player2 = p2;
+            Moves = new List<Movement>();
         }
 
 

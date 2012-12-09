@@ -11,34 +11,48 @@ namespace TicTacToeSignalR.Core.Mechanics
 {
     public class GameHub : Hub
     {
-        static ConcurrentDictionary<Guid, Player> _players = new ConcurrentDictionary<Guid, Player>();
-        static List<string> moves = new List<string>();
-        
+        private static ConcurrentDictionary<Guid, Player> _lobby = new ConcurrentDictionary<Guid, Player>();
+        private static ConcurrentDictionary<Guid, Game> _games = new ConcurrentDictionary<Guid, Game>();
+        private static ConcurrentBag<Invitation> _invitations = new ConcurrentBag<Invitation>();
 
-        public void GetGameMoves()
+        public void SendInviteResponse()
         {
-            Clients.All.updateSummary(moves);
         }
 
-        public void UpdateGameMoves()
+        public void PlayerJoined(Player johnDoe)
         {
-            moves.Add("test + " + Context.ConnectionId);
-            Clients.All.updateSummary(moves);
-        }
-
-        public void PlayerJoined()
-        {
-            Player johnDoe = new Player();
-            johnDoe.Nick = Clients.Caller.name;
-            johnDoe.Id = Guid.Parse(Context.ConnectionId);
-            _players.TryAdd(johnDoe.Id, johnDoe);
-
+            _lobby.TryAdd(johnDoe.Id, johnDoe);
             GetConnectedPlayers();
+        }
+
+        public void InviteToPlay(Invitation second)
+        {
+            second.SentDate = DateTime.Now;
+            if (_invitations.Contains(second))
+            {
+                Invitation first = null;
+                _invitations.TryTake(out first);
+                if (first != null && second.IsValidInvitation(first))
+                {
+                    _invitations.Add(second);
+                    Clients.Client(second.To.Id.ToString()).showInviteModal(second.From.Nick);
+                }
+                else
+                {
+                    _invitations.Add(first);
+                    Clients.Client(second.From.Id.ToString()).test("Rejected invitations can be resent 5 minutes apart.");
+                }
+            }
+            else
+            {
+                _invitations.Add(second);
+                Clients.Client(second.To.Id.ToString()).showInviteModal(second.From.Nick);
+            }
         }
 
         public void GetConnectedPlayers()
         {
-            List<Player> allPlayers = _players.Values.ToList();//.Select(p => p.Nick).ToList();
+            List<Player> allPlayers = _lobby.Values.ToList();
             Clients.All.refreshPlayersList(allPlayers);
         }
 
@@ -49,21 +63,18 @@ namespace TicTacToeSignalR.Core.Mechanics
             {
                 Guid guid = Guid.Parse(this.Context.ConnectionId);
                 Player toRemove = null;
-                bool hasBeenRemoved =_players.TryRemove(guid,out toRemove);
+                bool hasBeenRemoved = _lobby.TryRemove(guid, out toRemove);
                 if (hasBeenRemoved && toRemove != null)
                 {
-                    //return Clients.All.appendSummary(string.Format("Player {0} has left the game. You win!", toRemove.Nick));
                     return Task.Factory.StartNew(() => GetConnectedPlayers());
                 }
                 else
                 {
-                    //return Clients.All.appendSummary(string.Format("Player {0} has left the game. You win!", toRemove.Nick));
                     return Task.Factory.StartNew(() => GetConnectedPlayers());
                 }
             }
             catch
             {
-                //return Clients.All.appendSummary("Player has left the game. You win!");
                 return Task.Factory.StartNew(() => GetConnectedPlayers());
             }
         }

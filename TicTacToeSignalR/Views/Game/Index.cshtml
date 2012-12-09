@@ -104,7 +104,9 @@
         text-decoration:none;
         padding:3px;
     }
-    
+    #inviter {
+        font-weight:bold;
+    }
 </style>
 
 
@@ -115,20 +117,22 @@
             <ul id="players-container"></ul>
         </div>
         <div class="left-side">
-            <div id="invite" style="width:400px;">
-                <div style="width:300px;float:left">
-                    asdasfasadsasada invited you to play a match.
-                </div>
-                <div style="width:70px;float:right">
-                    <div style="width:35px;float:left">
-                        <a href="#" class="invite-answer" data-answer="yes">Yes</a>
+            <div id="invitation-container">
+@*                <div id="invite" style="width:400px;display:none;">
+                    <div style="width:300px;float:left">
+                        <span id="inviter"></span> invited you to play a match.
                     </div>
-                    <div style="width:35px;float:left">
-                        <a href="#" class="invite-answer" data-answer="no">No</a>
+                    <div style="width:70px;float:right">
+                        <div style="width:35px;float:left">
+                            <a href="#" class="invite-answer" data-answer="yes">Yes</a>
+                        </div>
+                        <div style="width:35px;float:left">
+                            <a href="#" class="invite-answer" data-answer="no">No</a>
+                        </div>
+                        <div style="clear:left;"></div>
                     </div>
-                    <div style="clear:left;"></div>
-                </div>
-                <div style="clear:both;"></div>
+                    <div style="clear:both;"></div>
+                </div>*@
             </div>
             <div style="clear:left;"></div>
         </div>
@@ -149,6 +153,27 @@
 
 
 <script type="text/javascript">
+ 
+    function DisplayInvite(fromNick) {
+        var markup = '<div id="invite" style="width:400px;">';
+        markup += '<div style="width:300px;float:left">';
+        markup += '<span id="inviter">';
+        markup += fromNick;
+        markup += '</span> invited you to play a match.</div>';
+        markup += '<div style="width:70px;float:right">';
+        markup += '     <div style="width:35px;float:left">';
+        markup += '         <a href="#" class="invite-answer" data-answer="yes">Yes</a>';
+        markup += '     </div>';
+        markup += '     <div style="width:35px;float:left">';
+        markup += '        <a href="#" class="invite-answer" data-answer="no">No</a>';
+        markup += '     </div>';
+        markup += '     <div style="clear:left;"></div>';
+        markup += ' </div>';
+        markup += ' <div style="clear:both;"></div>';
+        markup += '</div>';
+        return markup;
+    }
+
     $(function () {
         //helpermethods
         $('.tile[data-allowed="True"]').click(function () {
@@ -160,25 +185,49 @@
             };
         });
 
+ 
+
         $('.invite-answer').click(function (e) {
             var self = $(this);
-            if (self.attr('data-answer') == 'yes') {
-                $('.board-wrapper').fadeIn(200);
-                $('#lobby-wrapper').fadeOut(200);
-            }
-            else {
-                $('#invite').fadeOut(200);
-            }
+            proxy.server.sendInviteResponse(self.attr('data-answer'));
         });
-
-
-
-
 
 
         //signalR
         var proxy = $.connection.gameHub;
         proxy.state.name = '@TempData["nickname"]';
+
+        proxy.client.test = function (data) {
+            alert(data);
+        }
+
+        proxy.client.acceptedInvite = function() {
+            $('#lobby-wrapper').fadeOut(200, function () {
+                $('#invite').css("display", "none");
+                $('.board-wrapper').fadeIn(200);
+            });
+        }
+        proxy.client.rejectedInvite = function () {
+            $('#invite').fadeOut(200);
+        }
+
+        proxy.client.showInviteModal = function (nick) {
+            $('#invitation-container').append(DisplayInvite(nick));
+        };
+
+        proxy.client.inviteToPlayFromClient = function (toNick,toConnId) {
+            proxy.server.inviteToPlay(
+                {
+                    "From": {
+                        "Nick": proxy.state.name,
+                        "Id": $.connection.gameHub.connection.id
+                    },
+                    "To": {
+                        "Nick": toNick,
+                        "Id": toConnId
+                    }
+                });
+        }
 
         proxy.client.appendSummary = function (data) {
             $('.summary').append('<div>' + data + '</div>');
@@ -196,24 +245,26 @@
             $('#players-container > li').remove();
 
             $.each(playerList, function (index, player) {
-                var appendContent = '';
-                if (player != null && player.Nick != proxy.state.name) {
-                    appendContent = '<li><a href="#" class="player" data-id="' + player.Id + '">' + player.Nick + '</a></li>';
-                }
-                else {
-                    appendContent = '<li><a href="#">(o_O) ' + player.Nick + '</a></li>';
-                }
+                    var appendContent = '';
+                    if (player != null && player.Nick != proxy.state.name) {
+                        appendContent = '<li><a href="javascript:$.connection.gameHub.client.inviteToPlayFromClient(';
+                        appendContent += "'"+ player.Nick+"',";
+                        appendContent += "'" + player.Id + "'";
+                        appendContent += ')" class="player" data-id="' + player.Id + '">' + player.Nick + '</a></li>';
+                    }
+                    else {
+                        appendContent = '<li><a href="javascript:void(0)" data-id="' + player.Id + '">(o_O) ' + player.Nick + '</a></li>';
+                    }
                     $('#players-container').append(appendContent);
                 })
         }
-      
-        $('.player').click(function () {
-            
-        });
-
 
         $.connection.hub.start().done(function () {
-            proxy.server.playerJoined();
+            proxy.server.playerJoined(
+                {
+                    Nick: proxy.state.name,
+                    Id: $.connection.gameHub.connection.id
+                });
         })
         .fail(function () {
             console.log('failed to load signalr');
