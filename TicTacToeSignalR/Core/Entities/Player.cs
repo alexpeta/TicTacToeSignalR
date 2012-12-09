@@ -21,10 +21,9 @@ namespace TicTacToeSignalR
             set { _id = value; }
         }
         
-        public Player()
+        public Player() : this(string.Empty,Guid.Empty)
         {
         }
-
         public Player(string nick, Guid id)
         {
             Nick = nick;

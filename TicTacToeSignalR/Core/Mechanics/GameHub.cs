@@ -13,9 +13,7 @@ namespace TicTacToeSignalR.Core.Mechanics
     {
         static ConcurrentDictionary<Guid, Player> _players = new ConcurrentDictionary<Guid, Player>();
         static List<string> moves = new List<string>();
-
-      
-
+        
 
         public void GetGameMoves()
         {
@@ -28,21 +26,23 @@ namespace TicTacToeSignalR.Core.Mechanics
             Clients.All.updateSummary(moves);
         }
 
-
         public void PlayerJoined()
         {
             Player johnDoe = new Player();
             johnDoe.Nick = Clients.Caller.name;
             johnDoe.Id = Guid.Parse(Context.ConnectionId);
             _players.TryAdd(johnDoe.Id, johnDoe);
+
+            GetConnectedPlayers();
         }
 
         public void GetConnectedPlayers()
         {
-            List<string> allPlayerNames = _players.Values.Select(p => p.Nick).ToList();
-            Clients.All.updateSummary(allPlayerNames);
+            List<Player> allPlayers = _players.Values.ToList();//.Select(p => p.Nick).ToList();
+            Clients.All.refreshPlayersList(allPlayers);
         }
 
+        #region Overrides
         public override Task OnDisconnected()
         {
             try
@@ -52,17 +52,21 @@ namespace TicTacToeSignalR.Core.Mechanics
                 bool hasBeenRemoved =_players.TryRemove(guid,out toRemove);
                 if (hasBeenRemoved && toRemove != null)
                 {
-                    return Clients.All.appendSummary(string.Format("Player {0} has left the game. You win!", toRemove.Nick));
+                    //return Clients.All.appendSummary(string.Format("Player {0} has left the game. You win!", toRemove.Nick));
+                    return Task.Factory.StartNew(() => GetConnectedPlayers());
                 }
                 else
                 {
-                    return Clients.All.appendSummary(string.Format("Player {0} has left the game. You win!", toRemove.Nick));
+                    //return Clients.All.appendSummary(string.Format("Player {0} has left the game. You win!", toRemove.Nick));
+                    return Task.Factory.StartNew(() => GetConnectedPlayers());
                 }
             }
             catch
             {
-                return Clients.All.appendSummary("Player has left the game. You win!");
+                //return Clients.All.appendSummary("Player has left the game. You win!");
+                return Task.Factory.StartNew(() => GetConnectedPlayers());
             }
         }
+        #endregion
     }
 }

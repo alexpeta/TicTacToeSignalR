@@ -57,7 +57,6 @@
     #lobby .left-side {
         width:400px;
         float:left;
-        border:1px solid blue;
     }
     #lobby .right-side {
         width:100px;
@@ -78,66 +77,107 @@
         font-family:Tahoma;
         font-size:18px;
     }
+    #invite {
+        margin-left:10px;
+        background-color:#ff6a00;
+        color:#fff;
+        padding:10px;
+    }
+    #players-container {
+        background-color:#e0dcdc;
+    }
+    #players-container li {
+        padding:3px;
+        margin-bottom:1px;
+    }
+        
+    #players-container a {
+        color:black;
+        font-weight:normal;
+    }
+    #players-container a:hover {
+        background-color:#0094ff;
+    }
+    .invite-answer {
+        background-color:#fff;
+        color:red !important;
+        text-decoration:none;
+        padding:3px;
+    }
     
 </style>
+
 
 
 <div id="lobby-wrapper">
     <div id="lobby">
         <div class="left-side">
-            <ul>
-                @foreach(var p in Model.AllPlayers){
-                    <li><a href="#" class="player" data-id="">@p.Nick</a></li>
-                }
-            </ul>
+            <ul id="players-container"></ul>
+        </div>
+        <div class="left-side">
+            <div id="invite" style="width:400px;">
+                <div style="width:300px;float:left">
+                    asdasfasadsasada invited you to play a match.
+                </div>
+                <div style="width:70px;float:right">
+                    <div style="width:35px;float:left">
+                        <a href="#" class="invite-answer" data-answer="yes">Yes</a>
+                    </div>
+                    <div style="width:35px;float:left">
+                        <a href="#" class="invite-answer" data-answer="no">No</a>
+                    </div>
+                    <div style="clear:left;"></div>
+                </div>
+                <div style="clear:both;"></div>
+            </div>
+            <div style="clear:left;"></div>
         </div>
         <div style="clear:left;"></div>
     </div>
 </div>
 
 
-
-
-<h2> (X) vs (O)</h2>
-<div class="board-wrapper">
+<div class="board-wrapper" style="display:none;">
+    <h2></h2>
     <div class="gameplace">
         @Html.RenderBoard(Model,'x')
     </div>
     <div class="summary">        
     </div>
     <div style="clear:both;"></div>
-    <button type="button" id="trigger">Send request</button>
 </div>
 
 
 <script type="text/javascript">
     $(function () {
+        //helpermethods
         $('.tile[data-allowed="True"]').click(function () {
             var self = $(this);
-            //this should be a Movement object in c#
             var data = {
                 xPosition: self.attr('data-x'),
                 yPosition: self.attr('data-y'),
                 PieceType: 'x'
             };
-
-            //call SignalR to update game
         });
 
-        $('.player').click(function () {
-            $.post("/game/invite",
-                   { id : "alexpeta" },
-                   function (data) {
-                       alert("Data Loaded: " + data);
-                   });
+        $('.invite-answer').click(function (e) {
+            var self = $(this);
+            if (self.attr('data-answer') == 'yes') {
+                $('.board-wrapper').fadeIn(200);
+                $('#lobby-wrapper').fadeOut(200);
+            }
+            else {
+                $('#invite').fadeOut(200);
+            }
         });
-    });
-</script>
 
-<script type="text/javascript">
-    $(function () {
+
+
+
+
+
+        //signalR
         var proxy = $.connection.gameHub;
-
         proxy.state.name = '@TempData["nickname"]';
 
         proxy.client.appendSummary = function (data) {
@@ -152,18 +192,31 @@
             });
         };
 
+        proxy.client.refreshPlayersList = function (playerList) {
+            $('#players-container > li').remove();
 
-        $("#trigger").click(function () {
-            proxy.server.getConnectedPlayers(); //.updateGameMoves();
+            $.each(playerList, function (index, player) {
+                var appendContent = '';
+                if (player != null && player.Nick != proxy.state.name) {
+                    appendContent = '<li><a href="#" class="player" data-id="' + player.Id + '">' + player.Nick + '</a></li>';
+                }
+                else {
+                    appendContent = '<li><a href="#">(o_O) ' + player.Nick + '</a></li>';
+                }
+                    $('#players-container').append(appendContent);
+                })
+        }
+      
+        $('.player').click(function () {
+            
         });
 
+
         $.connection.hub.start().done(function () {
-            //proxy.state.id = $.connection.gameHub.connection.id;
-            //proxy.server.getConnectedPlayers();
             proxy.server.playerJoined();
         })
         .fail(function () {
-            alert('failed to load signalr');
+            console.log('failed to load signalr');
         });
     });
 </script>

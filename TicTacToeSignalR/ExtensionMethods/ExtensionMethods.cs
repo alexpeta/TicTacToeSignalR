@@ -16,9 +16,7 @@ namespace TicTacToeSignalR.ExtensionMethods
         /// <param name="helper"></param>
         public static MvcHtmlString RenderBoard(this HtmlHelper helper, Game game , char piece)
         {
-            if(game == null) return MvcHtmlString.Create(string.Empty);
-
-            if (game.Board == null) return MvcHtmlString.Create(string.Empty);
+            if(game == null || game.Board == null) return MvcHtmlString.Create(string.Empty);
             
             StringBuilder sb = new StringBuilder();
             sb.Append(@"<table class=""board"">");

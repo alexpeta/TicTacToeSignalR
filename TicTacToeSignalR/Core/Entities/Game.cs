@@ -53,13 +53,13 @@ namespace TicTacToeSignalR
         public Game()
         {
             Board = new char[Game.Dimension, Game.Dimension];
-            FillBoard();
+            //FillBoard();
         }
 
 
         private void FillBoard()
         {
-            char[] pieces = new char[Game.Dimension]{char.MinValue,'x','o'};
+            char[] pieces = new char[3]{char.MinValue,'x','o'};
             Random r = new Random();
 
             for (int i = 0; i < Game.Dimension; i++)
