@@ -155,6 +155,9 @@
     <Compile Include="Core\Entities\Player.cs" />
     <Compile Include="Core\Mechanics\GameContext.cs" />
     <Compile Include="Core\Mechanics\GameHub.cs" />
+    <Compile Include="Core\Mechanics\InviteManager.cs" />
+    <Compile Include="Core\Enums\InviteStatusType.cs" />
+    <Compile Include="Core\Mechanics\InviteStatus.cs" />
     <Compile Include="Core\Repository\GameRepository.cs" />
     <Compile Include="Core\Repository\PlayerRepository.cs" />
     <Compile Include="ExtensionMethods\ExtensionMethods.cs" />

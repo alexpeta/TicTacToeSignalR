@@ -9,10 +9,24 @@ namespace TicTacToeSignalR
     {
         public readonly int MinutesToExpire = 5;
 
-        //public Guid InviteId { get; set; }
+        public Guid InviteId { get; set; }
         public Player From { get; set; }
         public Player To { get; set; }
         public DateTime SentDate { get; set; }
+
+        #region Constructors
+        public Invitation() : this(Guid.NewGuid(),null,null,DateTime.Now)
+        {
+        }
+
+        public Invitation(Guid id, Player from,Player to, DateTime sentDate)
+        {
+            InviteId = id;
+            From = from;
+            To = to;
+            SentDate = sentDate;
+        }
+        #endregion
 
         public bool Equals(Invitation other)
         {

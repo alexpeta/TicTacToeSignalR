@@ -119,5 +119,17 @@ namespace TicTacToeSignalR.Tests
             //Assert
             Assert.IsTrue(first == second);
         }
+
+        [TestMethod]
+        public void Ivitation_DefaultConstructor_CreatesObjectWithValidState()
+        {
+            //Arrange
+            //Act
+            Invitation inviteDefaultConstructor = new Invitation();
+            Guid generatedGuid = Guid.Empty;
+
+            //Assert
+            Assert.AreNotEqual(Guid.Empty, inviteDefaultConstructor.InviteId);
+        }
     }
 }

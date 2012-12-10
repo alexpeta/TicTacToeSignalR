@@ -11,10 +11,32 @@ namespace TicTacToeSignalR.Core.Mechanics
 {
     public class GameHub : Hub
     {
+        #region Static
         private static ConcurrentDictionary<Guid, Player> _lobby = new ConcurrentDictionary<Guid, Player>();
         private static ConcurrentDictionary<Guid, Game> _games = new ConcurrentDictionary<Guid, Game>();
-        private static ConcurrentBag<Invitation> _invitations = new ConcurrentBag<Invitation>();
+        #endregion
 
+        #region Private properties
+        private InviteManager _inviteMananger;
+        #endregion
+
+        #region Public Properties
+        public InviteManager HubInviteManager
+        {
+            get { return _inviteMananger; }
+            set { _inviteMananger = value; }
+        }
+        #endregion
+
+        #region Constructors
+        public GameHub()
+        {
+            HubInviteManager = new InviteManager();
+        }
+        #endregion
+
+
+        #region Public Methods
         public void SendInviteResponse()
         {
         }
@@ -24,29 +46,18 @@ namespace TicTacToeSignalR.Core.Mechanics
             _lobby.TryAdd(johnDoe.Id, johnDoe);
             GetConnectedPlayers();
         }
-
-        public void InviteToPlay(Invitation second)
+        public void InviteToPlay(Invitation invitation)
         {
-            second.SentDate = DateTime.Now;
-            if (_invitations.Contains(second))
+            InviteStatus status = HubInviteManager.IsValidInvite(invitation);
+            switch (status.StatusType)
             {
-                Invitation first = null;
-                _invitations.TryTake(out first);
-                if (first != null && second.IsValidInvitation(first))
-                {
-                    _invitations.Add(second);
-                    Clients.Client(second.To.Id.ToString()).showInviteModal(second.From.Nick);
-                }
-                else
-                {
-                    _invitations.Add(first);
-                    Clients.Client(second.From.Id.ToString()).test("Rejected invitations can be resent 5 minutes apart.");
-                }
-            }
-            else
-            {
-                _invitations.Add(second);
-                Clients.Client(second.To.Id.ToString()).showInviteModal(second.From.Nick);
+                case InviteStatusType.Invalid:
+                    Clients.Client(invitation.From.Id.ToString()).test(status.Message);
+                    break;
+                case InviteStatusType.Valid:
+                default:
+                    Clients.Client(invitation.To.Id.ToString()).showInviteModal(invitation.From.Nick);
+                    break;
             }
         }
 
@@ -55,6 +66,7 @@ namespace TicTacToeSignalR.Core.Mechanics
             List<Player> allPlayers = _lobby.Values.ToList();
             Clients.All.refreshPlayersList(allPlayers);
         }
+        #endregion
 
         #region Overrides
         public override Task OnDisconnected()
