@@ -40,6 +40,18 @@ namespace TicTacToeSignalR
             }
         }
 
+        public void RemoveInvite(Guid inviteId)
+        {
+            if (inviteId != Guid.Empty)
+            {
+                Invitation inv = _invitations.Where(i => i.InviteId == inviteId).SingleOrDefault();
+                if (inv != null)
+                {
+                    _invitations.TryTake(out inv);
+                }
+            }
+        }
+
         public InviteStatus IsValidInvite(Invitation newInvitation)
         {
             if (HasPendingAnswers(newInvitation.From))
@@ -91,6 +103,7 @@ namespace TicTacToeSignalR
             return _invitations.Where(inv => inv.To.Equals(player)).Any();
         }
         #endregion
+
 
     }
 }

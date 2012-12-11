@@ -98,27 +98,27 @@ namespace TicTacToeSignalR.Tests
             Assert.IsTrue(first.Equals(second));
         }
 
-        [TestMethod]
-        public void Invitation_Equals_CheckOverridenOperatorEqualsIgnoresReferenceEquals()
-        {
-            //Act
-            Invitation first = new Invitation();
-            Invitation second = new Invitation();
-            Player p1 = new Player("Alex", "9C6109F9-5320-4411-9D1C-FA13D1CEC544");
-            Player p2 = new Player("Alex", "9C6109F9-5320-4411-9D1C-FA13D1CEC544");
+        //[TestMethod]
+        //public void Invitation_Equals_CheckOverridenOperatorEqualsIgnoresReferenceEquals()
+        //{
+        //    //Act
+        //    Invitation first = new Invitation();
+        //    Invitation second = new Invitation();
+        //    Player p1 = new Player("Alex", "9C6109F9-5320-4411-9D1C-FA13D1CEC544");
+        //    Player p2 = new Player("Alex", "9C6109F9-5320-4411-9D1C-FA13D1CEC544");
 
-            //Arrange
-            first.From = p1;
-            first.To = p2;
-            first.SentDate = new DateTime(2012, 12, 9, 10, 0, 0);
+        //    //Arrange
+        //    first.From = p1;
+        //    first.To = p2;
+        //    first.SentDate = new DateTime(2012, 12, 9, 10, 0, 0);
 
-            second.From = p1;
-            second.To = p2;
-            second.SentDate = new DateTime(2012, 12, 9, 10, 0, 0);
+        //    second.From = p1;
+        //    second.To = p2;
+        //    second.SentDate = new DateTime(2012, 12, 9, 10, 0, 0);
 
-            //Assert
-            Assert.IsTrue(first == second);
-        }
+        //    //Assert
+        //    Assert.IsTrue(first == second);
+        //}
 
         [TestMethod]
         public void Ivitation_DefaultConstructor_CreatesObjectWithValidState()

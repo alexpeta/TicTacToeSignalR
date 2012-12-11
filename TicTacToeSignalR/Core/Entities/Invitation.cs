@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Web;
 
 namespace TicTacToeSignalR
 {
     public class Invitation : IEquatable<Invitation>
     {
-        public readonly int MinutesToExpire = 5;
+        public readonly int MinutesToExpire = 1;
 
         public Guid InviteId { get; set; }
         public Player From { get; set; }
@@ -100,7 +101,26 @@ namespace TicTacToeSignalR
         //TODO : send the invite html markup to the client directly
         public string InviteToMarkup()
         {
-            throw new NotImplementedException();
+            StringBuilder sb = new StringBuilder();
+
+            sb.Append(string.Format(@"<div id=""{0}"" class=""invite"" style=""width:400px;"">",this.InviteId));
+            sb.Append(string.Format(@"<div style=""width:300px;float:left""><span id=""inviter"">{0}</span> invited you to play a match.</div>", this.From.Nick));
+            sb.Append(@"<div style=""width:70px;float:right"">");
+            sb.Append(@"     <div style=""width:35px;float:left"">");
+            sb.Append(string.Format(@"         <a href=""javascript:$.connection.gameHub.client.sendAnswer('{0}',true)"" class=""invite-answer"">Yes</a>",this.InviteId));
+            sb.Append("     </div>");;
+            sb.Append(@"     <div style=""width:35px;float:left"">");
+            sb.Append(string.Format(@"         <a href=""javascript:$.connection.gameHub.client.sendAnswer('{0}',false)"" class=""invite-answer"">No</a>",this.InviteId));
+            sb.Append(@"     </div>");
+            sb.Append(@"     <div style=""clear:left;""></div>");
+            sb.Append(@" </div>");
+            sb.Append(@" <div style=""clear:both;""></div>");
+            sb.Append(string.Format(@"<script type=""text/javascript"">
+                                       var t = setTimeout(""$('#{0}').remove();"",{1});                                     
+                                    </script>", this.InviteId,this.MinutesToExpire*60*1000));
+            sb.Append(@"</div>");
+
+            return sb.ToString();
         }
     }
 }

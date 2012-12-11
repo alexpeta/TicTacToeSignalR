@@ -138,31 +138,6 @@
 
 
 <script type="text/javascript">
- 
-    function GetInviteMarkup(id, fromNick) {
-        var markup = '<div id="' + id + '" class="invite" style="width:400px;">';
-        markup += '<div style="width:300px;float:left">';
-        markup += '<span id="inviter">';
-        markup += fromNick;
-        markup += '</span> invited you to play a match.</div>';
-        markup += '<div style="width:70px;float:right">';
-        markup += '     <div style="width:35px;float:left">';
-        markup += '         <a href="javascript:$.connection.gameHub.client.sendAnswer(';
-        markup += "'" + id + "',true";
-        markup += ')" class="invite-answer">Yes</a>';
-        markup += '     </div>';
-        markup += '     <div style="width:35px;float:left">';
-        markup += '         <a href="javascript:$.connection.gameHub.client.sendAnswer(';
-        markup += "'" + id + "',false";
-        markup += ')" class="invite-answer">No</a>';
-        markup += '     </div>';
-        markup += '     <div style="clear:left;"></div>';
-        markup += ' </div>';
-        markup += ' <div style="clear:both;"></div>';
-        markup += '</div>';
-        return markup;
-    }
-
     $(function () {
         //helpermethods
         $('.tile[data-allowed="True"]').click(function () {
@@ -202,8 +177,8 @@
             $('#invite').fadeOut(200);
         }
 
-        proxy.client.showInviteModal = function (id,nick) {
-            $('#invitation-container').append(GetInviteMarkup(id, nick));
+        proxy.client.showInviteModal = function (markup) {
+            $('#invitation-container').append(markup);
         };
 
         proxy.client.inviteToPlayFromClient = function (toNick,toConnId) {
@@ -248,6 +223,9 @@
                     }
                     $('#players-container').append(appendContent);
                 })
+        }
+
+        proxy.server.autoCloseInvite = function (guid) {
         }
 
         $.connection.hub.start().done(function () {

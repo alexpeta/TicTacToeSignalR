@@ -37,6 +37,16 @@ namespace TicTacToeSignalR.Core.Mechanics
 
 
         #region Public Methods
+        public void AutoCloseInvite(Guid inviteId)
+        {
+            if (inviteId != Guid.Empty)
+            {
+                Invitation sentInvite = HubInviteManager.GetInvitationByInvitationId(inviteId);
+                HubInviteManager.RemoveInvite(inviteId);
+                Clients.Client(sentInvite.From.Id.ToString()).test(string.Format("Your invite to {0} has expired.",sentInvite.From.Nick));
+            }
+        }
+
         public void SendInviteAnswer(InviteAnswer answer)
         {
             if (answer == null)
@@ -78,7 +88,7 @@ namespace TicTacToeSignalR.Core.Mechanics
                     break;
                 case InviteStatusType.Valid:
                 default:
-                    Clients.Client(invitation.To.Id.ToString()).showInviteModal(invitation.InviteId.ToString(),invitation.From.Nick);
+                    Clients.Client(invitation.To.Id.ToString()).showInviteModal(invitation.InviteToMarkup());
                     break;
             }
         }
