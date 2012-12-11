@@ -26,6 +26,17 @@ namespace TicTacToeSignalR
             To = to;
             SentDate = sentDate;
         }
+        //deep copy constructor
+        public Invitation(Invitation other)
+        {
+            if (other != null)
+            {
+                To = other.To;
+                From = other.From;
+                InviteId = other.InviteId;
+                SentDate = other.SentDate;
+            }
+        }
         #endregion
 
         public bool Equals(Invitation other)
@@ -86,5 +97,10 @@ namespace TicTacToeSignalR
             return (this.SentDate - olderInvitation.SentDate) > TimeSpan.FromMinutes(MinutesToExpire);
         }
 
+        //TODO : send the invite html markup to the client directly
+        public string InviteToMarkup()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -8,6 +8,8 @@ namespace TicTacToeSignalR
     public enum InviteStatusType
     {
         Valid = 0,
-        Invalid = 1
+        Invalid = 1,
+        Rejected = 2,
+        Accepted = 3
     }
 }

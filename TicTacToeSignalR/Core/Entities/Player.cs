@@ -54,6 +54,6 @@ namespace TicTacToeSignalR
         //    return !(lhs == rhs);
         //}
 
-        //TODO: override get hash code
+        //override get hash code
     }
 }

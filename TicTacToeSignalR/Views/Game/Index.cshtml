@@ -77,7 +77,7 @@
         font-family:Tahoma;
         font-size:18px;
     }
-    #invite {
+    .invite {
         margin-left:10px;
         background-color:#ff6a00;
         color:#fff;
@@ -118,21 +118,6 @@
         </div>
         <div class="left-side">
             <div id="invitation-container">
-@*                <div id="invite" style="width:400px;display:none;">
-                    <div style="width:300px;float:left">
-                        <span id="inviter"></span> invited you to play a match.
-                    </div>
-                    <div style="width:70px;float:right">
-                        <div style="width:35px;float:left">
-                            <a href="#" class="invite-answer" data-answer="yes">Yes</a>
-                        </div>
-                        <div style="width:35px;float:left">
-                            <a href="#" class="invite-answer" data-answer="no">No</a>
-                        </div>
-                        <div style="clear:left;"></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                </div>*@
             </div>
             <div style="clear:left;"></div>
         </div>
@@ -154,18 +139,22 @@
 
 <script type="text/javascript">
  
-    function DisplayInvite(fromNick) {
-        var markup = '<div id="invite" style="width:400px;">';
+    function GetInviteMarkup(id, fromNick) {
+        var markup = '<div id="' + id + '" class="invite" style="width:400px;">';
         markup += '<div style="width:300px;float:left">';
         markup += '<span id="inviter">';
         markup += fromNick;
         markup += '</span> invited you to play a match.</div>';
         markup += '<div style="width:70px;float:right">';
         markup += '     <div style="width:35px;float:left">';
-        markup += '         <a href="#" class="invite-answer" data-answer="yes">Yes</a>';
+        markup += '         <a href="javascript:$.connection.gameHub.client.sendAnswer(';
+        markup += "'" + id + "',true";
+        markup += ')" class="invite-answer">Yes</a>';
         markup += '     </div>';
         markup += '     <div style="width:35px;float:left">';
-        markup += '        <a href="#" class="invite-answer" data-answer="no">No</a>';
+        markup += '         <a href="javascript:$.connection.gameHub.client.sendAnswer(';
+        markup += "'" + id + "',false";
+        markup += ')" class="invite-answer">No</a>';
         markup += '     </div>';
         markup += '     <div style="clear:left;"></div>';
         markup += ' </div>';
@@ -186,13 +175,6 @@
         });
 
  
-
-        $('.invite-answer').click(function (e) {
-            var self = $(this);
-            proxy.server.sendInviteResponse(self.attr('data-answer'));
-        });
-
-
         //signalR
         var proxy = $.connection.gameHub;
         proxy.state.name = '@TempData["nickname"]';
@@ -201,18 +183,27 @@
             alert(data);
         }
 
-        proxy.client.acceptedInvite = function() {
+        proxy.client.startGame = function() {
             $('#lobby-wrapper').fadeOut(200, function () {
                 $('#invite').css("display", "none");
                 $('.board-wrapper').fadeIn(200);
             });
         }
-        proxy.client.rejectedInvite = function () {
+
+        proxy.client.sendAnswer = function (id, answer) {
+            $('#' + id).fadeOut(answer == true ? 0 : 200);
+            proxy.server.sendInviteAnswer({
+                InviteId: id,
+                Accepted: answer
+            });
+        }
+
+        proxy.client.showRejectedMessage = function () {
             $('#invite').fadeOut(200);
         }
 
-        proxy.client.showInviteModal = function (nick) {
-            $('#invitation-container').append(DisplayInvite(nick));
+        proxy.client.showInviteModal = function (id,nick) {
+            $('#invitation-container').append(GetInviteMarkup(id, nick));
         };
 
         proxy.client.inviteToPlayFromClient = function (toNick,toConnId) {

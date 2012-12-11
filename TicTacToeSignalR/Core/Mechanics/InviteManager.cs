@@ -15,6 +15,31 @@ namespace TicTacToeSignalR
         }
 
 
+        public Invitation GetInvitationByInvitationId(Guid invitationId)
+        {
+            if (invitationId == Guid.Empty) return null;
+
+            //deep copy
+            Invitation invitation = new Invitation(_invitations.Where(i => i.InviteId == invitationId).FirstOrDefault());
+
+            return invitation;
+        }
+
+        public InviteStatus ValidateAnswer(InviteAnswer answer)
+        {
+            Invitation invitation = _invitations.Where(i => i.InviteId == answer.InviteId).FirstOrDefault();
+            bool invDeletedFromMemory = _invitations.TryTake(out invitation);
+
+            if (!answer.Accepted)
+            {
+                return new InviteStatus { Message = string.Format("{0} rejected your invitation.", invitation.To.Nick), StatusType = InviteStatusType.Rejected };
+            }
+            else
+            {
+                return new InviteStatus { Message = string.Format("{0} accepted!", invitation.To.Nick), StatusType = InviteStatusType.Accepted };
+            }
+        }
+
         public InviteStatus IsValidInvite(Invitation newInvitation)
         {
             if (HasPendingAnswers(newInvitation.From))
@@ -66,7 +91,6 @@ namespace TicTacToeSignalR
             return _invitations.Where(inv => inv.To.Equals(player)).Any();
         }
         #endregion
-
 
     }
 }
