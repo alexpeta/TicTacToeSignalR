@@ -98,7 +98,19 @@ namespace TicTacToeSignalR
             return (this.SentDate - olderInvitation.SentDate) > TimeSpan.FromMinutes(MinutesToExpire);
         }
 
-        //TODO : send the invite html markup to the client directly
+
+        public Game CreateGameFromInvite()
+        {
+            if (this.From != null && this.To != null)
+            {
+                return new Game(this.From, this.To);
+            }
+            else
+            {
+                throw new ApplicationException("Can't create Game From Invite!!!!");
+            }
+        }
+
         public string InviteToMarkup()
         {
             StringBuilder sb = new StringBuilder();
@@ -115,9 +127,9 @@ namespace TicTacToeSignalR
             sb.Append(@"     <div style=""clear:left;""></div>");
             sb.Append(@" </div>");
             sb.Append(@" <div style=""clear:both;""></div>");
-            sb.Append(string.Format(@"<script type=""text/javascript"">
-                                       var t = setTimeout(""$('#{0}').remove();"",{1});                                     
-                                    </script>", this.InviteId,this.MinutesToExpire*60*1000));
+//            sb.Append(string.Format(@"<script type=""text/javascript"">
+//                                       var t = setTimeout(""$('#{0}').remove();"",{1});                                     
+//                                    </script>", this.InviteId,this.MinutesToExpire*60*1000));
             sb.Append(@"</div>");
 
             return sb.ToString();

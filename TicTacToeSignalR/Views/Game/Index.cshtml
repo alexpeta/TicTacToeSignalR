@@ -1,5 +1,4 @@
 ﻿@model TicTacToeSignalR.ViewModel.GameViewModel
-@using TicTacToeSignalR.ExtensionMethods
 @{
     ViewBag.Title = "Index";
 }
@@ -129,7 +128,6 @@
 <div class="board-wrapper" style="display:none;">
     <h2></h2>
     <div class="gameplace">
-        @Html.RenderBoard(Model,'x')
     </div>
     <div class="summary">        
     </div>
@@ -171,6 +169,10 @@
                 InviteId: id,
                 Accepted: answer
             });
+        }
+
+        proxy.client.clientRenderBoard = function(boardMarkup) {
+            $('#gameplace').append(boardMarkup);
         }
 
         proxy.client.showRejectedMessage = function () {
@@ -224,6 +226,7 @@
                     $('#players-container').append(appendContent);
                 })
         }
+
 
         proxy.server.autoCloseInvite = function (guid) {
         }

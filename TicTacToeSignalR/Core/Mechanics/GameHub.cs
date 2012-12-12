@@ -13,11 +13,11 @@ namespace TicTacToeSignalR.Core.Mechanics
     {
         #region Static
         private static ConcurrentDictionary<Guid, Player> _lobby = new ConcurrentDictionary<Guid, Player>();
-        private static ConcurrentDictionary<Guid, Game> _games = new ConcurrentDictionary<Guid, Game>();
         #endregion
 
         #region Private properties
         private InviteManager _inviteMananger;
+        private GameManager _gameManager;
         #endregion
 
         #region Public Properties
@@ -26,12 +26,18 @@ namespace TicTacToeSignalR.Core.Mechanics
             get { return _inviteMananger; }
             set { _inviteMananger = value; }
         }
+        public GameManager GameManager
+        {
+            get { return _gameManager; }
+            set { _gameManager = value; }
+        }
         #endregion
 
         #region Constructors
         public GameHub()
         {
             HubInviteManager = new InviteManager();
+            HubGameManager = new GameManager();
         }
         #endregion
 
@@ -64,10 +70,26 @@ namespace TicTacToeSignalR.Core.Mechanics
                     Clients.Client(invitation.From.Id.ToString()).test(status.Message);
                     break;
                 case InviteStatusType.Accepted:
-                default:
-                    //TODO: CREATE and START GAME HERE
-                    Clients.Client(invitation.From.Id.ToString()).test("Starting game...");
-                    Clients.Client(invitation.To.Id.ToString()).test("Starting game....");
+                default:           
+                    //debug code. error is thrown here...
+                    Game game = null;
+                    game = GameManager.CreateGame(invitation);                   
+
+
+                    if (game != null)
+                    {
+                        Clients.Client(invitation.From.Id.ToString()).test("xxx");
+                        Clients.Client(invitation.To.Id.ToString()).test("xxx");
+                    }
+                    else
+                    {
+                        Clients.Client(invitation.From.Id.ToString()).test("ok");
+                        Clients.Client(invitation.To.Id.ToString()).test("ok");
+                    }
+
+
+                    //Clients.Client(game.Player1.Id.ToString()).clientRenderBoard(HubGameManager.GetBoardMarkup(game.GameId, game.Player1.Id));
+                    //Clients.Client(game.Player2.Id.ToString()).clientRenderBoard(HubGameManager.GetBoardMarkup(game.GameId, game.Player2.Id));
                     break;
             }
         }
@@ -95,8 +117,8 @@ namespace TicTacToeSignalR.Core.Mechanics
 
         public void GetConnectedPlayers()
         {
-            List<Player> allPlayers = _lobby.Values.ToList();
-            Clients.All.refreshPlayersList(allPlayers);
+            var playersList = _lobby.Values.ToList();
+            Clients.All.refreshPlayersList(playersList);
         }
         #endregion
 
@@ -117,5 +139,7 @@ namespace TicTacToeSignalR.Core.Mechanics
             }
         }
         #endregion
+
+        public Mechanics.GameManager HubGameManager { get; set; }
     }
 }

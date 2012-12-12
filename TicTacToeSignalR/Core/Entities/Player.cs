@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Web;
 
 namespace TicTacToeSignalR
@@ -33,7 +34,6 @@ namespace TicTacToeSignalR
             Id = id;
         }
 
-        
         public bool Equals(Player other)
         {
             if (other == null) return false;
@@ -42,18 +42,19 @@ namespace TicTacToeSignalR
                 this.Id == other.Id;
         }
 
-        //public static bool operator ==(Player lhs, Player rhs)
-        //{
-        //    if (lhs == null || rhs == null) return false;
+        [Obsolete]
+        public string GetPlayerMarkup(string currentNick = "")
+        {
+            StringBuilder sb = new StringBuilder();
 
-        //    return lhs.Nick == rhs.Nick &&
-        //        lhs.Id == rhs.Id;
-        //}
-        //public static bool operator !=(Player lhs, Player rhs)
-        //{
-        //    return !(lhs == rhs);
-        //}
+            if (string.IsNullOrEmpty(this.Nick))
+            {
+                return string.Empty;
+            }
 
-        //override get hash code
+            sb.Append(string.Format(@"<li><a href=""javascript:$.connection.gameHub.client.inviteToPlayFromClient('{0}','{1}')"" class=""player"">{2}</a></li>", this.Nick, this.Id, this.Nick));
+
+            return sb.ToString();
+        }
     }
 }
