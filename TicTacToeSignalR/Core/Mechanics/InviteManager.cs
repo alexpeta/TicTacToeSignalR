@@ -13,8 +13,7 @@ namespace TicTacToeSignalR
         public InviteManager()
         {
         }
-
-
+        
         public Invitation GetInvitationByInvitationId(Guid invitationId)
         {
             if (invitationId == Guid.Empty) return null;
@@ -27,9 +26,19 @@ namespace TicTacToeSignalR
 
         public InviteStatus ValidateAnswer(InviteAnswer answer)
         {
-            Invitation invitation = _invitations.Where(i => i.InviteId == answer.InviteId).FirstOrDefault();
-            bool invDeletedFromMemory = _invitations.TryTake(out invitation);
+            if(answer == null) 
+            {
+               return new InviteStatus { Message = string.Format("Invalid invitation!"), StatusType = InviteStatusType.Invalid };
+            }
 
+
+            Invitation invitation = _invitations.SingleOrDefault(i => i.InviteId == answer.InviteId);
+            if (invitation == null)
+            {
+                return new InviteStatus { Message = string.Format("Error getting getting invitation from in-memory list."), StatusType = InviteStatusType.Invalid };
+            }
+            
+            //bool invDeletedFromMemory = _invitations.TryTake(out invitation);
             if (!answer.Accepted)
             {
                 return new InviteStatus { Message = string.Format("{0} rejected your invitation.", invitation.To.Nick), StatusType = InviteStatusType.Rejected };
@@ -40,16 +49,18 @@ namespace TicTacToeSignalR
             }
         }
 
-        public void RemoveInvite(Guid inviteId)
+        public Invitation ExtractInvite(Guid inviteId)
         {
+            Invitation result = null;
             if (inviteId != Guid.Empty)
             {
-                Invitation inv = _invitations.Where(i => i.InviteId == inviteId).SingleOrDefault();
-                if (inv != null)
+                result = _invitations.Where(i => i.InviteId == inviteId).SingleOrDefault();
+                if (result != null)
                 {
-                    _invitations.TryTake(out inv);
+                    _invitations.TryTake(out result);                  
                 }
             }
+            return result;
         }
 
         public InviteStatus IsValidInvite(Invitation newInvitation)

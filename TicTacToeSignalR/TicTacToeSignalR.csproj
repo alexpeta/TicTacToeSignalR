@@ -154,6 +154,7 @@
     <Compile Include="Core\Entities\InviteAnswer.cs" />
     <Compile Include="Core\Entities\Movement.cs" />
     <Compile Include="Core\Entities\Player.cs" />
+    <Compile Include="Core\Enums\Nicknames.cs" />
     <Compile Include="Core\Mechanics\ConcurrentBag.cs" />
     <Compile Include="Core\Mechanics\GameContext.cs" />
     <Compile Include="Core\Mechanics\GameHub.cs" />
@@ -173,6 +174,32 @@
     <Compile Include="ViewModel\GameViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\avatars\IDR_PROFILE_AVATAR_0.png" />
+    <Content Include="Content\avatars\IDR_PROFILE_AVATAR_1.png" />
+    <Content Include="Content\avatars\IDR_PROFILE_AVATAR_10.png" />
+    <Content Include="Content\avatars\IDR_PROFILE_AVATAR_11.png" />
+    <Content Include="Content\avatars\IDR_PROFILE_AVATAR_12.png" />
+    <Content Include="Content\avatars\IDR_PROFILE_AVATAR_13.png" />
+    <Content Include="Content\avatars\IDR_PROFILE_AVATAR_14.png" />
+    <Content Include="Content\avatars\IDR_PROFILE_AVATAR_15.png" />
+    <Content Include="Content\avatars\IDR_PROFILE_AVATAR_16.png" />
+    <Content Include="Content\avatars\IDR_PROFILE_AVATAR_17.png" />
+    <Content Include="Content\avatars\IDR_PROFILE_AVATAR_18.png" />
+    <Content Include="Content\avatars\IDR_PROFILE_AVATAR_19.png" />
+    <Content Include="Content\avatars\IDR_PROFILE_AVATAR_2.png" />
+    <Content Include="Content\avatars\IDR_PROFILE_AVATAR_20.png" />
+    <Content Include="Content\avatars\IDR_PROFILE_AVATAR_21.png" />
+    <Content Include="Content\avatars\IDR_PROFILE_AVATAR_22.png" />
+    <Content Include="Content\avatars\IDR_PROFILE_AVATAR_23.png" />
+    <Content Include="Content\avatars\IDR_PROFILE_AVATAR_24.png" />
+    <Content Include="Content\avatars\IDR_PROFILE_AVATAR_25.png" />
+    <Content Include="Content\avatars\IDR_PROFILE_AVATAR_3.png" />
+    <Content Include="Content\avatars\IDR_PROFILE_AVATAR_4.png" />
+    <Content Include="Content\avatars\IDR_PROFILE_AVATAR_5.png" />
+    <Content Include="Content\avatars\IDR_PROFILE_AVATAR_6.png" />
+    <Content Include="Content\avatars\IDR_PROFILE_AVATAR_7.png" />
+    <Content Include="Content\avatars\IDR_PROFILE_AVATAR_8.png" />
+    <Content Include="Content\avatars\IDR_PROFILE_AVATAR_9.png" />
     <Content Include="Content\themes\base\images\o.png" />
     <Content Include="Content\themes\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />
     <Content Include="Content\themes\base\images\ui-bg_flat_75_ffffff_40x100.png" />

@@ -18,32 +18,22 @@ namespace TicTacToeSignalR.Core.Mechanics
         public Game CreateGame(Invitation invite)
         {
             Game result = null;
-
-            if (invite != null)
+            try
             {
-                if (invite.From != null && invite.To != null)
+                if (invite != null)
                 {
-                    result = new Game(invite.From, invite.To);
-                }
-                else
-                {
-                    throw new ApplicationException("invite players are null!!");
-                }
-
-
-                if (result != null)
-                {
-                    _games.TryAdd(result.GameId, result);
+                    if (invite.From != null && invite.To != null)
+                    {
+                        result = new Game(invite.From, invite.To);
+                        _games.TryAdd(result.GameId, result);
+                    }
                 }
             }
-            else
+            catch
             {
-                throw new ApplicationException("Can't create Game: null invite!");
             }
-
             return result;
-        }
-       
+        }       
         public string GetBoardMarkup(Guid gameId, Guid playerId)
         {
             Game game = null;
@@ -68,8 +58,6 @@ namespace TicTacToeSignalR.Core.Mechanics
                 return "Error loading board";
             }
         }
-
-
         private string RenderBoard(Game game, char piece)
         {
             if (game == null || game.Board == null) return string.Empty;

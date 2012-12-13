@@ -11,7 +11,7 @@
         @Scripts.Render("~/bundles/signalrinclude")
         @Scripts.Render("~/signalr/hubs")
     </head>
-    <body>
+    <body>@*
         <header>
             <div class="content-wrapper">
                 <div class="float-left">
@@ -19,7 +19,7 @@
                 </div>
                 <div class="float-right">
                     <section id="login">
-                      @*  @Html.Partial("_LoginPartial")*@
+                      @*  @Html.Partial("_LoginPartial")
                     </section>
                     <nav>
                         <ul id="menu">
@@ -29,14 +29,14 @@
                     </nav>
                 </div>
             </div>
-        </header>
+        </header>*@
         <div id="body">
             @RenderSection("featured", required: false)
             <section class="content-wrapper main-content clear-fix">
                 @RenderBody()
             </section>
         </div>
-        <footer>
+@*        <footer>
             <div class="content-wrapper">
                 <div class="float-left">
                     <p>&copy; @DateTime.Now.Year - TicTacToe with SignalR</p>
@@ -48,7 +48,7 @@
                     </ul>
                 </div>
             </div>
-        </footer>
+        </footer>*@
         @RenderSection("scripts", required: false)
 
     </body>

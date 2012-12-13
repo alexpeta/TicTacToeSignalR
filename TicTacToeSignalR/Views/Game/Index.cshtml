@@ -171,8 +171,9 @@
             });
         }
 
-        proxy.client.clientRenderBoard = function(boardMarkup) {
-            $('#gameplace').append(boardMarkup);
+        proxy.client.clientRenderBoard = function (boardMarkup) {
+            $('.gameplace').append(boardMarkup);
+            $('.board-wrapper').css("display", "block");
         }
 
         proxy.client.showRejectedMessage = function () {
@@ -218,7 +219,7 @@
                         appendContent = '<li><a href="javascript:$.connection.gameHub.client.inviteToPlayFromClient(';
                         appendContent += "'"+ player.Nick+"',";
                         appendContent += "'" + player.Id + "'";
-                        appendContent += ')" class="player" data-id="' + player.Id + '">' + player.Nick + '</a></li>';
+                        appendContent += ')" class="player">' + player.Nick + '</a></li>';
                     }
                     else {
                         appendContent = '<li><a href="javascript:void(0)" data-id="' + player.Id + '">(o_O) ' + player.Nick + '</a></li>';

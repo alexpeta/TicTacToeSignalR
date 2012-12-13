@@ -1,51 +1,94 @@
-﻿@model string
+﻿@model List<FileInfo>
 @{
     ViewBag.Title = "Welcome";
 }
+<style type="text/css">
+    #manage-profile {
+        font-family: 'Segoe UI', Tahoma, sans-serif;
+        width: 452px;
+        padding:10px;
+        -webkit-border-radius: 3px;
+        border-radius:3px;
+        background: white;
+        box-shadow: 0 4px 23px 5px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0, 0, 0, 0.15);
+    }
+    #manage-profile h1{
+        -webkit-padding-end: 24px;
+        -webkit-user-select: none;
+        color: #333;
+        font-size: 120%;
+        margin: 0;
+        padding-bottom:15px;
+        text-shadow: white 0 1px 2px;   
+        font-weight:normal;     
+    }
+    #manage-profile ul {
+        list-style-type : none;
+        padding:0;
+        margin:0px;
+    }
+    #manage-profile ul li {
+       float:left;
+    }
+    #manage-profile .label {
+        margin-bottom:20px;
+        font-weight:normal;
+    }
+    .button {
+        border-color: rgba(0, 0, 0, 0.3);
+        box-shadow: 0 1px 0 rgba(0, 0, 0, 0.12), inset 0 1px 2px rgba(255, 255, 255, 0.95);
+        color: black;
+        border: 1px solid rgba(0, 0, 0, 0.25);
+        border-radius: 2px;
+        box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08), inset 0 1px 2px rgba(255, 255, 255, 0.75);
+        color: #444;
+        font: inherit;
+        margin: 0 1px 0 0;
+        text-shadow: 0 1px 0 #F0F0F0;
+        cursor:pointer;
+    }
+    #avatars li a {
+        margin:0px;
+        padding:2px;
+        width:38px;
+        height:31px;
+        display:block;
+    }
+    #avatars li a:hover {
+        background-color:#ff006e;
+    }
+    #avatars li a.selected {
+        background-color:#0094ff;
+    }
+    
+</style>
 
-@section featured {
-    <section class="featured">
-        <div class="content-wrapper">
-            <hgroup class="title">
-                <h1>@ViewBag.Title.</h1>
-                <h2>@ViewBag.Message</h2>
-            </hgroup>
-            <p>
-                
-            </p>
+
+
+<div id="manage-profile" class="page" style="margin-left:auto;margin-right:auto;">
+    <h1>Create Player Profile</h1>
+    <div class="label">Choose a picture and name:</div>
+    <div>
+        <ul id="avatars">
+            @foreach (var file in Model)
+            {
+                <li>
+                    <a href="#">
+                       <img src="\Content\avatars\@file.Name" title="Choose an avatar" />
+                    </a>
+                </li>
+            }
+        </ul>
+        <div style="clear:left;"></div>
+    </div>
+    <div class="label"></div>
+    <div>
+        <div style="margin-left:auto;margin-right:auto;width:256px;">
+            @using (Html.BeginForm("Index","Home",FormMethod.Post,null))
+            {
+                <input type="text" name="nickname" id="nickname" style="width:170px;padding:3px;" value="@ViewBag.Nickname"/>
+                <input type="submit" class="button" value="Accept" />
+            }
         </div>
-    </section>
-}
-<h3>Start playing right away just after a couple of easy steps:</h3>
-<ol class="round">
-    <li class="one">
-        <h5>Set your nick and visit the lobby </h5>
-        <br />
-        @using (Html.BeginForm("Index","Home",FormMethod.Post,null))
-        {
-            <input type="text" name="nickname" id="nickname" style="width:250px;padding:3px;" value="@ViewBag.Nickname"/>
-            <input type="submit" value="Go!" />
-        }
-    </li>
-    <li class="two">
-        <h5>Invite to play</h5>
-        Click on a player name in the lobby to send an invitation to a game.
-    </li>
-    <li class="three">
-        <h5>Count the victories</h5>
-        Enjoy the game, and don't forget to give feedback!
-        </li>
-</ol>
-
-
-@*
-<script type="text/javascript">
-    $(function () {
-        var gameContextHub = $.connection.gameContext;
-        
-        // Start the connection and request current state
-        $.connection.hub.start();
-    });
-</script>
-
-*@
+    </div>
+</div>

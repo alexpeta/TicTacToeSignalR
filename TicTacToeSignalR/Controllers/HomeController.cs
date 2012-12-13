@@ -1,4 +1,7 @@
-﻿using System.Web.Mvc;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Web.Mvc;
 using TicTacToeSignalR.Core;
 using TicTacToeSignalR.Core.Mechanics;
 using TicTacToeSignalR.Models;
@@ -26,6 +29,10 @@ namespace TicTacToeSignalR.Controllers
 
         public ActionResult Index()
         {
+            DirectoryInfo avatarsDir = new DirectoryInfo(Server.MapPath("~/Content/avatars/"));
+            List<FileInfo> files = avatarsDir.GetFiles().ToList();
+                                    //.OrderBy(f=> int.Parse(f.Name.Replace("IDR_PROFILE_AVATAR_","").Replace(".png"))).ToList();
+
             string cookieNick = string.Empty;
             if (CookieManager.CheckUserCookie(this.HttpContext))
             {
@@ -35,7 +42,8 @@ namespace TicTacToeSignalR.Controllers
             TempData["nickname"] = cookieNick;
            // _gameContext.AddPlayer(cookieNick);
 
-            return View();
+
+            return View(files);
         }
 
         [HttpPost]

@@ -13,8 +13,6 @@ namespace TicTacToeSignalR
         private Guid _gameId;
         private Player _player1;
         private Player _player2;
-        private char _p1Piece;
-        private char _p2Piece;
         private char[,] _board;
         private List<Movement> _moves;
         #endregion

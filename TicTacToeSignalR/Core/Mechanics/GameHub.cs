@@ -26,7 +26,7 @@ namespace TicTacToeSignalR.Core.Mechanics
             get { return _inviteMananger; }
             set { _inviteMananger = value; }
         }
-        public GameManager GameManager
+        public GameManager HubGameManager
         {
             get { return _gameManager; }
             set { _gameManager = value; }
@@ -48,11 +48,10 @@ namespace TicTacToeSignalR.Core.Mechanics
             if (inviteId != Guid.Empty)
             {
                 Invitation sentInvite = HubInviteManager.GetInvitationByInvitationId(inviteId);
-                HubInviteManager.RemoveInvite(inviteId);
+                //HubInviteManager.RemoveInvite(inviteId);
                 Clients.Client(sentInvite.From.Id.ToString()).test(string.Format("Your invite to {0} has expired.",sentInvite.From.Nick));
             }
         }
-
         public void SendInviteAnswer(InviteAnswer answer)
         {
             if (answer == null)
@@ -60,40 +59,35 @@ namespace TicTacToeSignalR.Core.Mechanics
                 //TODO: make this more robust.
                 Clients.Caller.test("Error sending response.");
             }
-
-            Invitation invitation = HubInviteManager.GetInvitationByInvitationId(answer.InviteId);
             InviteStatus status = HubInviteManager.ValidateAnswer(answer);
+            Invitation invitation = HubInviteManager.ExtractInvite(answer.InviteId);
 
             switch (status.StatusType)
             {
+                case InviteStatusType.Invalid:
+                    Clients.All.test("invalid");
+                    break;
+                case InviteStatusType.Valid:
+                    Clients.All.test("invalid");
+                    break;
                 case InviteStatusType.Rejected:
                     Clients.Client(invitation.From.Id.ToString()).test(status.Message);
                     break;
                 case InviteStatusType.Accepted:
-                default:           
-                    //debug code. error is thrown here...
-                    Game game = null;
-                    game = GameManager.CreateGame(invitation);                   
-
-
+                default:
+                    Game game = HubGameManager.CreateGame(invitation);
                     if (game != null)
                     {
-                        Clients.Client(invitation.From.Id.ToString()).test("xxx");
-                        Clients.Client(invitation.To.Id.ToString()).test("xxx");
+                        Clients.Client(game.Player1.Id.ToString()).clientRenderBoard(HubGameManager.GetBoardMarkup(game.GameId, game.Player1.Id));
+                        Clients.Client(game.Player2.Id.ToString()).clientRenderBoard(HubGameManager.GetBoardMarkup(game.GameId, game.Player2.Id));
                     }
                     else
                     {
-                        Clients.Client(invitation.From.Id.ToString()).test("ok");
-                        Clients.Client(invitation.To.Id.ToString()).test("ok");
+                        Clients.All.test("error game is null");
                     }
-
-
-                    //Clients.Client(game.Player1.Id.ToString()).clientRenderBoard(HubGameManager.GetBoardMarkup(game.GameId, game.Player1.Id));
-                    //Clients.Client(game.Player2.Id.ToString()).clientRenderBoard(HubGameManager.GetBoardMarkup(game.GameId, game.Player2.Id));
                     break;
             }
         }
-
         public void PlayerJoined(Player johnDoe)
         {
             _lobby.TryAdd(johnDoe.Id, johnDoe);
@@ -102,6 +96,7 @@ namespace TicTacToeSignalR.Core.Mechanics
         public void InviteToPlay(Invitation invitation)
         {
             InviteStatus status = HubInviteManager.IsValidInvite(invitation);
+            //HubInviteManager.AddInvite(invitation);
             switch (status.StatusType)
             {
                 case InviteStatusType.Invalid:
@@ -139,7 +134,5 @@ namespace TicTacToeSignalR.Core.Mechanics
             }
         }
         #endregion
-
-        public Mechanics.GameManager HubGameManager { get; set; }
     }
 }
