@@ -6,6 +6,7 @@ using TicTacToeSignalR.Core;
 using TicTacToeSignalR.Core.Mechanics;
 using TicTacToeSignalR.Models;
 using TicTacToeSignalR.Utility;
+using TicTacToeSignalR.ViewModel;
 
 namespace TicTacToeSignalR.Controllers
 {
@@ -29,34 +30,50 @@ namespace TicTacToeSignalR.Controllers
 
         public ActionResult Index()
         {
-            DirectoryInfo avatarsDir = new DirectoryInfo(Server.MapPath("~/Content/avatars/"));
-            List<FileInfo> files = avatarsDir.GetFiles().ToList();
-                                    //.OrderBy(f=> int.Parse(f.Name.Replace("IDR_PROFILE_AVATAR_","").Replace(".png"))).ToList();
 
             string cookieNick = string.Empty;
-            if (CookieManager.CheckUserCookie(this.HttpContext))
+            string avatarNick = string.Empty;
+
+            if (CookieManager.CheckCookie(this.HttpContext,CookieManager.UserCookieName))
             {
                 cookieNick = CookieManager.CookieValue;
             }
-            ViewBag.Nickname = cookieNick;
-            TempData["nickname"] = cookieNick;
-           // _gameContext.AddPlayer(cookieNick);
+
+            if (CookieManager.CheckCookie(this.HttpContext, CookieManager.AvatarCookieName))
+            {
+                avatarNick = CookieManager.CookieValue;
+            }
 
 
-            return View(files);
+            DirectoryInfo avatarsDir = new DirectoryInfo(Server.MapPath("~/Content/avatars/"));
+            List<string> avatarsList = avatarsDir.GetFiles()
+                .OrderBy(f => 
+                    {
+                        int result = 0;
+                        bool conversion = int.TryParse(f.Name.Replace("IDR_PROFILE_AVATAR_", "").Replace(".png", ""),out result);
+                        return result;
+                    })
+                .Select(f => f.Name)
+                //.Select(f => @"\Content\avatars\"+f.Name )
+                .ToList();
+            ProfileViewModel viewModel = new ProfileViewModel(cookieNick, avatarNick, avatarsList);
+
+            return View(viewModel);
         }
 
         [HttpPost]
-        public ActionResult Index(string nickname)
+        public ActionResult Index(ProfileViewModel profile)
         {
-            if (string.IsNullOrEmpty(nickname))
+            if (string.IsNullOrEmpty(profile.Nick) || string.IsNullOrEmpty(profile.Avatar))
             {
                 return View();
             }
             else
             {
                 //TODO : check if nick is already taken
-                CookieManager.WriteUserCoockie(this.HttpContext, nickname);
+                CookieManager.WriteCoockie(this.HttpContext, CookieManager.UserCookieName, profile.Nick);
+                CookieManager.WriteCoockie(this.HttpContext, CookieManager.AvatarCookieName, profile.Avatar);
+                TempData["profileData"] = profile;
                 return RedirectToAction("Index", "Game");
             }
         }

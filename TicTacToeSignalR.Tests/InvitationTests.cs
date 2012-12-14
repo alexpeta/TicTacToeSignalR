@@ -16,8 +16,8 @@ namespace TicTacToeSignalR.Tests
             //Act
             Invitation first = new Invitation();
             Invitation second = new Invitation();
-            Player p1 = new Player("Alex", "9C6109F9-5320-4411-9D1C-FA13D1CEC544");
-            Player p2 = new Player("Bogdan", "3D072B37-0937-43EB-A77F-137B4DD08E03");
+            Player p1 = new Player("Alex", "9C6109F9-5320-4411-9D1C-FA13D1CEC544",string.Empty);
+            Player p2 = new Player("Bogdan", "3D072B37-0937-43EB-A77F-137B4DD08E03", string.Empty);
 
             //Arrange
             first.From = p1;
@@ -38,8 +38,8 @@ namespace TicTacToeSignalR.Tests
             //Act
             Invitation first = new Invitation();
             Invitation second = new Invitation();
-            Player p1 = new Player("Alex", "9C6109F9-5320-4411-9D1C-FA13D1CEC544");
-            Player p2 = new Player("Bogdan", "3D072B37-0937-43EB-A77F-137B4DD08E03");
+            Player p1 = new Player("Alex", "9C6109F9-5320-4411-9D1C-FA13D1CEC544", string.Empty);
+            Player p2 = new Player("Bogdan", "3D072B37-0937-43EB-A77F-137B4DD08E03", string.Empty);
 
             //Arrange
             first.From = p1;
@@ -60,8 +60,8 @@ namespace TicTacToeSignalR.Tests
             //Act
             Invitation first = new Invitation();
             Invitation second = new Invitation();
-            Player p1 = new Player("Alex", "9C6109F9-5320-4411-9D1C-FA13D1CEC544");
-            Player p2 = new Player("Bogdan", "3D072B37-0937-43EB-A77F-137B4DD08E03");
+            Player p1 = new Player("Alex", "9C6109F9-5320-4411-9D1C-FA13D1CEC544", string.Empty);
+            Player p2 = new Player("Bogdan", "3D072B37-0937-43EB-A77F-137B4DD08E03", string.Empty);
 
             //Arrange
             first.From = p1;
@@ -82,8 +82,8 @@ namespace TicTacToeSignalR.Tests
             //Act
             Invitation first = new Invitation();
             Invitation second = new Invitation();
-            Player p1 = new Player("Alex", "9C6109F9-5320-4411-9D1C-FA13D1CEC544");
-            Player p2 = new Player("Alex", "9C6109F9-5320-4411-9D1C-FA13D1CEC544");
+            Player p1 = new Player("Alex", "9C6109F9-5320-4411-9D1C-FA13D1CEC544", string.Empty);
+            Player p2 = new Player("Alex", "9C6109F9-5320-4411-9D1C-FA13D1CEC544", string.Empty);
 
             //Arrange
             first.From = p1;
@@ -137,8 +137,8 @@ namespace TicTacToeSignalR.Tests
         {
             //Arrange
             Guid id = Guid.Parse("A499F757-C538-4559-A156-5D658BDEC0F3");
-            Player p1 = new Player("Alex", "9C6109F9-5320-4411-9D1C-FA13D1CEC544");
-            Player p2 = new Player("Bogdan", "3D072B37-0937-43EB-A77F-137B4DD08E03");
+            Player p1 = new Player("Alex", "9C6109F9-5320-4411-9D1C-FA13D1CEC544", string.Empty);
+            Player p2 = new Player("Bogdan", "3D072B37-0937-43EB-A77F-137B4DD08E03", string.Empty);
             DateTime dateTime = new DateTime(2012, 12, 9, 10, 0, 0);
             Invitation invite = new Invitation(id, p1, p2, dateTime);
             Game gameToTest = null;

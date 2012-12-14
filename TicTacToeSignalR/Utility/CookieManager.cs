@@ -8,33 +8,24 @@ namespace TicTacToeSignalR.Utility
 {
     public static class CookieManager
     {
-        private static string _cookieName = ConfigurationManager.AppSettings.GetValues("ticTacToeUsername").SingleOrDefault();
-        private static string _cookieValue = string.Empty;
+        public static string UserCookieName = ConfigurationManager.AppSettings.GetValues("ticTacToeUsername").SingleOrDefault();
+        public static string AvatarCookieName = ConfigurationManager.AppSettings.GetValues("ticTacToeAvatar").SingleOrDefault();
 
-        #region Public properties
-        public static string CookieValue
-        {
-            get { return CookieManager._cookieValue; }
-            set { CookieManager._cookieValue = value; }
-        }
-        public static string CookieName
-        {
-            get { return _cookieName; }
-            set { _cookieName = value; }
-        }
-        #endregion
+        public static string CookieValue = string.Empty;
 
-        public static bool CheckUserCookie(HttpContextBase context)
+        public static bool CheckCookie(HttpContextBase context,string cookieName)
         {
             if (context == null) return false;
+
+            if (string.IsNullOrEmpty(cookieName)) return false;
 
             if (context.Request == null) return false;
 
             try
             {
-                if (context.Request.Cookies[_cookieName] != null)
+                if (context.Request.Cookies[cookieName] != null)
                 {
-                    _cookieValue = context.Request.Cookies[_cookieName].Value;
+                    CookieValue = context.Request.Cookies[cookieName].Value;
                     return true;
                 }
                 else
@@ -48,19 +39,20 @@ namespace TicTacToeSignalR.Utility
             }
         }
 
-        public static void WriteUserCoockie(HttpContextBase context, string username)
+        public static void WriteCoockie(HttpContextBase context,string cookieName, string value)
         {
             if (context == null) return;
 
             if (context.Response == null) return;
 
-            if (CheckUserCookie(context))
+            if (CheckCookie(context,cookieName))
             {
-                context.Response.Cookies.Remove(_cookieName);
+                context.Response.Cookies.Remove(cookieName);
             }
 
-            HttpCookie cookie = new HttpCookie(_cookieName);
-            cookie.Value = username;
+            HttpCookie cookie = new HttpCookie(cookieName);
+            cookie.HttpOnly = true;
+            cookie.Value = value;
             cookie.Expires = DateTime.Now.AddMonths(12);
 
             context.Response.Cookies.Add(cookie);

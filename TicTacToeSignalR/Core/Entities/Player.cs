@@ -10,6 +10,7 @@ namespace TicTacToeSignalR
     {
         private string _nick;
         private Guid _id;
+        private string _avatar;
 
         public string Nick
         {
@@ -21,26 +22,41 @@ namespace TicTacToeSignalR
             get { return _id; }
             set { _id = value; }
         }
-        
-        public Player() : this(string.Empty,Guid.Empty)
+        public string Avatar
+        {
+            get { return _avatar; }
+            set { _avatar = value; }
+        }
+
+        public string AvatarUrl
+        {
+            get { return @"\Content\avatars\" + Avatar; }
+        }
+
+        #region Constructors
+        public Player() : this(string.Empty,Guid.Empty,string.Empty)
         {
         }
-        public Player(string nick, string id) : this(nick,Guid.Parse(id))
+        public Player(string nick, string id,string avatar) : this(nick,Guid.Parse(id),avatar)
         {
         }
-        public Player(string nick, Guid id)
+        public Player(string nick, Guid id,string avatar)
         {
             Nick = nick;
             Id = id;
+            Avatar = avatar;
         }
+        #endregion Constructors
 
         public bool Equals(Player other)
         {
             if (other == null) return false;
 
             return this.Nick == other.Nick &&
-                this.Id == other.Id;
+                this.Id == other.Id &&
+                this.Avatar == other.Avatar;
         }
+
 
         [Obsolete]
         public string GetPlayerMarkup(string currentNick = "")

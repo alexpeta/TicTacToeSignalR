@@ -12,32 +12,18 @@ namespace TicTacToeSignalR.Controllers
 {
     public class GameController : Controller
     {
-        #region
-        //private r
-        #endregion
-
         #region Constructors
         public GameController()
         {
         }
         #endregion
 
-        //
-        // GET: /Game/{7974E9CA-AC9D-403F-8D31-BB8DB58CD8FD}
-        public ActionResult Index(Guid? id)
+        // GET: /Game/
+        public ActionResult Index(int? id)
         {
-            GameViewModel vm = new GameViewModel();
-            return View(vm);
+            ProfileViewModel profile = TempData["profileData"] as ProfileViewModel;
+            return View(profile);
         }
-
-        [HttpPost]
-        public string Invite(string id)
-        {
-           
-            return "all good chief!";
-        }
-
-
 
         [HttpPost]
         public string Index()

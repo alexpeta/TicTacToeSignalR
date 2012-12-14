@@ -1,4 +1,4 @@
-﻿@model List<FileInfo>
+﻿@model TicTacToeSignalR.ViewModel.ProfileViewModel
 @{
     ViewBag.Title = "Welcome";
 }
@@ -63,19 +63,36 @@
     
 </style>
 
-
+<script type="text/javascript">
+    function selectAvatar(name) {
+        if (name != null) {
+            $('#avatars a').removeClass('selected');
+            $('#avatars a[data-id="' + name + '"]').addClass('selected');
+            $('#Avatar').val(name);
+        }
+    }
+</script>
 
 <div id="manage-profile" class="page" style="margin-left:auto;margin-right:auto;">
     <h1>Create Player Profile</h1>
     <div class="label">Choose a picture and name:</div>
     <div>
         <ul id="avatars">
-            @foreach (var file in Model)
+            @foreach (var pic in Model.AvatarsList)
             {
                 <li>
-                    <a href="#">
-                       <img src="\Content\avatars\@file.Name" title="Choose an avatar" />
-                    </a>
+                    @if(Model.Avatar == pic)
+                    {
+                        <a href="javascript:selectAvatar('@pic');" data-id="@pic" class="selected">
+                            <img src="\Content\avatars\@pic" title="Choose an avatar" style="border:0px;" />
+                        </a>
+                    }
+                    else
+                    {
+                        <a href="javascript:selectAvatar('@pic');" data-id="@pic">
+                            <img src="\Content\avatars\@pic" title="Choose an avatar" style="border:0px;" />
+                        </a>
+                    }
                 </li>
             }
         </ul>
@@ -86,7 +103,8 @@
         <div style="margin-left:auto;margin-right:auto;width:256px;">
             @using (Html.BeginForm("Index","Home",FormMethod.Post,null))
             {
-                <input type="text" name="nickname" id="nickname" style="width:170px;padding:3px;" value="@ViewBag.Nickname"/>
+                <input type="hidden" name="Avatar" id="Avatar" value="@Model.Avatar" />
+                <input type="text" name="nick" id="nick" style="width:170px;padding:3px;" value="@Model.Nick"/>
                 <input type="submit" class="button" value="Accept" />
             }
         </div>

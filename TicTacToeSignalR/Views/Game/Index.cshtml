@@ -1,4 +1,4 @@
-﻿@model TicTacToeSignalR.ViewModel.GameViewModel
+﻿@model TicTacToeSignalR.ViewModel.ProfileViewModel
 @{
     ViewBag.Title = "Index";
 }
@@ -69,12 +69,15 @@
         padding:0px;
         margin:0px;
     }
+    #lobby .left-side ul li img{
+        vertical-align:middle;
+    }
     #lobby .left-side ul li a {
-        display:block;
-        text-align:right;
         text-decoration: none;
         font-family:Tahoma;
         font-size:18px;
+        width:260px;
+        vertical-align:middle;
     }
     .invite {
         margin-left:10px;
@@ -95,7 +98,7 @@
         font-weight:normal;
     }
     #players-container a:hover {
-        background-color:#0094ff;
+        background-color:#ffd800;
     }
     .invite-answer {
         background-color:#fff;
@@ -147,10 +150,10 @@
             };
         });
 
- 
         //signalR
         var proxy = $.connection.gameHub;
-        proxy.state.name = '@TempData["nickname"]';
+        proxy.state.name = '@Model.Nick';
+        proxy.state.avatar = '@Model.Avatar';
 
         proxy.client.test = function (data) {
             alert(data);
@@ -216,13 +219,17 @@
             $.each(playerList, function (index, player) {
                     var appendContent = '';
                     if (player != null && player.Nick != proxy.state.name) {
-                        appendContent = '<li><a href="javascript:$.connection.gameHub.client.inviteToPlayFromClient(';
+                        appendContent = '<li>';
+                        appendContent += '<img src="' + player.AvatarUrl + '" style="border:0px;"/>';
+                        appendContent += '<a href="javascript:$.connection.gameHub.client.inviteToPlayFromClient(';
                         appendContent += "'"+ player.Nick+"',";
                         appendContent += "'" + player.Id + "'";
                         appendContent += ')" class="player">' + player.Nick + '</a></li>';
                     }
                     else {
-                        appendContent = '<li><a href="javascript:void(0)" data-id="' + player.Id + '">(o_O) ' + player.Nick + '</a></li>';
+                        appendContent = '<li>';
+                        appendContent += '<img src="' + player.AvatarUrl + '" style="border:0px;"/>';
+                        appendContent += '<a href="javascript:void(0)" data-id="' + player.Id + '">(o_O) ' + player.Nick + '</a></li>';
                     }
                     $('#players-container').append(appendContent);
                 })
@@ -236,7 +243,8 @@
             proxy.server.playerJoined(
                 {
                     Nick: proxy.state.name,
-                    Id: $.connection.gameHub.connection.id
+                    Id: $.connection.gameHub.connection.id,
+                    Avatar: proxy.state.avatar
                 });
         })
         .fail(function () {
