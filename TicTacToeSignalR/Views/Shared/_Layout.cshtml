@@ -11,25 +11,7 @@
         @Scripts.Render("~/bundles/signalrinclude")
         @Scripts.Render("~/signalr/hubs")
     </head>
-    <body>@*
-        <header>
-            <div class="content-wrapper">
-                <div class="float-left">
-                    <p class="site-title">@Html.ActionLink("TicTacToe", "Index", "Home")</p>
-                </div>
-                <div class="float-right">
-                    <section id="login">
-                      @*  @Html.Partial("_LoginPartial")
-                    </section>
-                    <nav>
-                        <ul id="menu">
-                            <li>@Html.ActionLink("Home", "Index", "Home")</li>
-                            <li>@Html.ActionLink("About", "About", "Home")</li>
-                        </ul>
-                    </nav>
-                </div>
-            </div>
-        </header>*@
+    <body>
         <div id="body">
             @RenderSection("featured", required: false)
             <section class="content-wrapper main-content clear-fix">

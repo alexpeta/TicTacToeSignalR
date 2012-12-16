@@ -43,13 +43,60 @@ namespace TicTacToeSignalR
             set { _moves = value; }
         }
 
-        public Game(Player p1, Player p2)
+        public event EventHandler PlayerHasMoved;
+        public void OnPlayerHasMoved()
         {
-            GameId = Guid.NewGuid();
-            Board = new char[Game.Dimension, Game.Dimension];
+            var handler = PlayerHasMoved;
+            if (handler != null)
+            {
+                PlayerHasMoved(this, EventArgs.Empty);
+            }
+        }
+
+
+        #region Constructors
+        public Game()
+            : this(Guid.Empty, new char[Game.Dimension, Game.Dimension], Player.Null, Player.Null, new List<Movement>())
+        {
+        }
+        public Game(Player p1, Player p2)
+            : this(Guid.NewGuid(), new char[Game.Dimension, Game.Dimension], p1, p2, new List<Movement>())
+        {
+        }
+        public Game (Guid gameId,char[,] board,Player p1, Player p2, List<Movement> moves)
+	    {
+            GameId = gameId;
+            Board = board;
             Player1 = p1;
             Player2 = p2;
-            Moves = new List<Movement>();
+            Moves = moves;
+	    }
+        #endregion
+
+        #region NullObject Pattern
+        private static readonly Game _nullGame = new Game();
+
+        public static Game Null
+        {
+            get { return Game._nullGame; }
+        }         
+        #endregion
+
+        public bool AddMove(Movement move,Guid playerId)
+        {
+           if(!isValidMove(move,playerId))
+           {
+               return false;
+           }
+           else
+           {
+               return true;
+           }
+        }
+
+        private bool isValidMove(Movement move, Guid playerId)
+        {
+            throw new NotImplementedException();
         }
 
         [Obsolete]
@@ -66,7 +113,6 @@ namespace TicTacToeSignalR
                 }
             }
         }
-
 
     }
 }

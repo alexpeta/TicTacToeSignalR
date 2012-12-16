@@ -14,13 +14,11 @@ namespace TicTacToeSignalR.Controllers
     {
         #region Private Members
         private IPlayerRepository _playerRepository;
-        private GameContext _gameContext;
         #endregion
 
         #region Constructors
         public HomeController() : this(new PlayerRepository())
         {
-            _gameContext = new GameContext();
         }
         public HomeController(IPlayerRepository playerRepo)
         {

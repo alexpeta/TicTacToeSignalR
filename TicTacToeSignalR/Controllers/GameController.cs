@@ -22,6 +22,10 @@ namespace TicTacToeSignalR.Controllers
         public ActionResult Index(int? id)
         {
             ProfileViewModel profile = TempData["profileData"] as ProfileViewModel;
+            if (profile == null)
+            {
+                profile = ProfileViewModel.Null;
+            }
             return View(profile);
         }
 

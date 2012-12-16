@@ -75,9 +75,15 @@ namespace TicTacToeSignalR.Core.Mechanics
                     break;
                 case InviteStatusType.Accepted:
                 default:
+                    //create the new game
                     Game game = HubGameManager.CreateGame(invitation);
+                    
+                    //TODO : make the move event work
+                    //game.PlayerHasMoved -= OnPlayerHasMoved(game,new EventArgs());
+
                     if (game != null)
                     {
+                        //start the game for the players.
                         Clients.Client(game.Player1.Id.ToString()).clientRenderBoard(HubGameManager.GetBoardMarkup(game.GameId, game.Player1.Id));
                         Clients.Client(game.Player2.Id.ToString()).clientRenderBoard(HubGameManager.GetBoardMarkup(game.GameId, game.Player2.Id));
                     }
@@ -115,7 +121,13 @@ namespace TicTacToeSignalR.Core.Mechanics
             var playersList = _lobby.Values.ToList();
             Clients.All.refreshPlayersList(playersList);
         }
-        #endregion
+
+        #region Handle Events
+        public void OnPlayerHasMoved(object sender, EventArgs e)
+        {
+
+        }
+        #endregion Handle Events
 
         #region Overrides
         public override Task OnDisconnected()
@@ -133,6 +145,9 @@ namespace TicTacToeSignalR.Core.Mechanics
                 return Task.Factory.StartNew(() => GetConnectedPlayers());
             }
         }
-        #endregion
+        #endregion Overrides
+        #endregion Public Methods
+
+
     }
 }

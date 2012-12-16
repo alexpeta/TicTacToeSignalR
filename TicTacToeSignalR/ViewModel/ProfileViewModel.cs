@@ -30,6 +30,8 @@ namespace TicTacToeSignalR.ViewModel
             set { _avatar = value; }
         }
 
+
+        #region Constructors
         public ProfileViewModel(): this(string.Empty,string.Empty,new List<string>())
         {
         }
@@ -39,10 +41,21 @@ namespace TicTacToeSignalR.ViewModel
             Avatar = avatar;
             Nick = nick;
         }
+        #endregion
+
+
+        #region NullObject Pattern
+        private static readonly ProfileViewModel _nullProfileViewModel = new ProfileViewModel(string.Empty,string.Empty,new List<string>());
+
+        public static ProfileViewModel Null
+        {
+            get { return ProfileViewModel._nullProfileViewModel; }
+        }
+        #endregion
 
 
 
-        
-        
+
+
     }
 }

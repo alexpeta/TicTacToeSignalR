@@ -155,8 +155,6 @@
     <Compile Include="Core\Entities\Movement.cs" />
     <Compile Include="Core\Entities\Player.cs" />
     <Compile Include="Core\Enums\Nicknames.cs" />
-    <Compile Include="Core\Mechanics\ConcurrentBag.cs" />
-    <Compile Include="Core\Mechanics\GameContext.cs" />
     <Compile Include="Core\Mechanics\GameHub.cs" />
     <Compile Include="Core\Mechanics\GameManager.cs" />
     <Compile Include="Core\Mechanics\InviteManager.cs" />

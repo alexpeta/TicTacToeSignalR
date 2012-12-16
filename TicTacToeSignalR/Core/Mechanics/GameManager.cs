@@ -15,49 +15,6 @@ namespace TicTacToeSignalR.Core.Mechanics
         {
         }
 
-        public Game CreateGame(Invitation invite)
-        {
-            Game result = null;
-            try
-            {
-                if (invite != null)
-                {
-                    if (invite.From != null && invite.To != null)
-                    {
-                        result = new Game(invite.From, invite.To);
-                        _games.TryAdd(result.GameId, result);
-                    }
-                }
-            }
-            catch
-            {
-            }
-            return result;
-        }       
-        public string GetBoardMarkup(Guid gameId, Guid playerId)
-        {
-            Game game = null;
-            bool gotValue = _games.TryGetValue(gameId, out game);
-            if (game != null)
-            {
-                if (game.Player1 != null && game.Player1.Id == playerId)
-                {
-                    return this.RenderBoard(game, 'x');
-                }
-                else if (game.Player2 != null && game.Player2.Id == playerId)
-                {
-                    return this.RenderBoard(game, 'o');
-                }
-                else
-                {
-                    return "Error loading board";
-                }
-            }
-            else
-            {
-                return "Error loading board";
-            }
-        }
         private string RenderBoard(Game game, char piece)
         {
             if (game == null || game.Board == null) return string.Empty;
@@ -84,5 +41,54 @@ namespace TicTacToeSignalR.Core.Mechanics
 
             return sb.ToString();
         }
+
+        #region Public Methods
+        public Game CreateGame(Invitation invite)
+        {
+            Game result = null;
+            if (invite != null)
+            {
+                if (invite.From != null && invite.To != null)
+                {
+                    result = new Game(invite.From, invite.To);
+                    _games.TryAdd(result.GameId, result);
+                }
+            }
+            return result;
+        }
+        public string GetBoardMarkup(Guid gameId, Guid playerId)
+        {
+            Game game = null;
+            bool gotValue = _games.TryGetValue(gameId, out game);
+            if (game != null)
+            {
+                if (game.Player1 != null && game.Player1.Id == playerId)
+                {
+                    return this.RenderBoard(game, 'x');
+                }
+                else if (game.Player2 != null && game.Player2.Id == playerId)
+                {
+                    return this.RenderBoard(game, 'o');
+                }
+                else
+                {
+                    return "Error loading board";
+                }
+            }
+            else
+            {
+                return "Error loading board";
+            }
+        }
+        public Game GetGameById(Guid gameId)
+        {
+            Game result = Game.Null;
+            if (_games.ContainsKey(gameId))
+            {
+                bool gotGame = _games.TryGetValue(gameId,out result);
+            }
+            return result;
+        }
+        #endregion
     }
 }

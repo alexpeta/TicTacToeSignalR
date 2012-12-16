@@ -42,6 +42,7 @@ namespace TicTacToeSignalR
 
         public bool Equals(Invitation other)
         {
+            if(object.ReferenceEquals(this,other)) return true;
             if (other == null) return false;
 
             return this.From.Equals(other.From) &&

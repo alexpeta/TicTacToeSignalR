@@ -48,6 +48,16 @@ namespace TicTacToeSignalR
         }
         #endregion Constructors
 
+        #region Null Object Pattern
+        private static readonly Player _nullPlayer = new Player(string.Empty, string.Empty, string.Empty);
+        public static Player Null
+        {
+            get { return Player._nullPlayer; }
+        }         
+        #endregion
+
+
+
         public bool Equals(Player other)
         {
             if (other == null) return false;
