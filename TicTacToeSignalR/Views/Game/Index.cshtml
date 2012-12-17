@@ -86,7 +86,9 @@
         padding:10px;
     }
     #players-container {
-        background-color:#e0dcdc;
+        /*background-color:#e0dcdc;*/
+        background-color: #808080;
+        border-radius:8px;
     }
     #players-container li {
         padding:3px;
@@ -94,7 +96,7 @@
     }
         
     #players-container a {
-        color:black;
+        color:white;
         font-weight:normal;
     }
     #players-container a:hover {
@@ -157,6 +159,27 @@
 
         proxy.client.test = function (data) {
             alert(data);
+        }
+        
+        proxy.client.callMovePiece = function (px,py,paramPiece,cellId) {
+            //making selection for current player
+            var selectedCell = $('#' + cellId);
+            selectedCell.removeAttr('href');
+            selectedCell.removeClass(paramPiece).addClass('selected' + paramPiece);
+
+            //preparing what to send to the server
+            var move = {
+                x: px,
+                y: py,
+                piece: paramPiece
+            };
+            var gameId = $('.board').attr('data-id');
+            var playerId = $.connection.gameHub.connection.id;
+            proxy.server.callMovePiece(gameId, move, playerId);
+        }
+
+        proxy.client.movePiece = function (message, movement) {
+            proxy.client.appendSummary(message);
         }
 
         proxy.client.startGame = function() {

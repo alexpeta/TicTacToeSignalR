@@ -37,19 +37,20 @@ namespace TicTacToeSignalR
             get { return _board; }
             set { _board = value; }
         }
-        public List<Movement> Moves
-        {
-            get { return _moves; }
-            set { _moves = value; }
-        }
+        //public List<Movement> Moves
+        //{
+        //    get { return _moves; }
+        //    set { _moves = value; }
+        //}
 
-        public event EventHandler PlayerHasMoved;
-        public void OnPlayerHasMoved()
+        public event EventHandler<NotificationEventArgs<Movement>> PlayerHasMovedPiece;
+
+        private void RaisePlayerHasMoved(NotificationEventArgs<Movement> e)
         {
-            var handler = PlayerHasMoved;
+            var handler = PlayerHasMovedPiece;
             if (handler != null)
             {
-                PlayerHasMoved(this, EventArgs.Empty);
+                PlayerHasMovedPiece(this,e);
             }
         }
 
@@ -69,7 +70,7 @@ namespace TicTacToeSignalR
             Board = board;
             Player1 = p1;
             Player2 = p2;
-            Moves = moves;
+            _moves = moves;
 	    }
         #endregion
 
@@ -82,21 +83,33 @@ namespace TicTacToeSignalR
         }         
         #endregion
 
-        public bool AddMove(Movement move,Guid playerId)
+        public bool AddMove(Movement move,string playerId)
         {
-           if(!isValidMove(move,playerId))
-           {
-               return false;
-           }
-           else
-           {
-               return true;
-           }
+            Player replyTo = null;
+            if (this.Player1.Id != playerId)
+            {
+                replyTo = this.Player1;
+            }
+            else
+            {
+                replyTo = this.Player2;
+            }
+
+            if (!isValidMove(move, playerId))
+            {
+                RaisePlayerHasMoved(new NotificationEventArgs<Movement>(replyTo.Id, "Invalid move", move));
+                return false;
+            }
+            else
+            {
+                RaisePlayerHasMoved(new NotificationEventArgs<Movement>(replyTo.Id, "Move is valid!!", move));
+                return true;
+            }
         }
 
-        private bool isValidMove(Movement move, Guid playerId)
+        private bool isValidMove(Movement move, string playerId)
         {
-            throw new NotImplementedException();
+            return true;
         }
 
         [Obsolete]

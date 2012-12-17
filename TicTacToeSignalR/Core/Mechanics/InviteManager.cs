@@ -6,15 +6,15 @@ using System.Web;
 
 namespace TicTacToeSignalR
 {
-    public class InviteManager
+    public static class InviteManager
     {
         private static ConcurrentBag<Invitation> _invitations = new ConcurrentBag<Invitation>();
 
-        public InviteManager()
+        static InviteManager()
         {
         }
-        
-        public Invitation GetInvitationByInvitationId(Guid invitationId)
+
+        public static Invitation GetInvitationByInvitationId(Guid invitationId)
         {
             if (invitationId == Guid.Empty) return null;
 
@@ -24,7 +24,7 @@ namespace TicTacToeSignalR
             return invitation;
         }
 
-        public InviteStatus ValidateAnswer(InviteAnswer answer)
+        public static InviteStatus ValidateAnswer(InviteAnswer answer)
         {
             if(answer == null) 
             {
@@ -49,7 +49,7 @@ namespace TicTacToeSignalR
             }
         }
 
-        public Invitation ExtractInvite(Guid inviteId)
+        public static Invitation ExtractInvite(Guid inviteId)
         {
             Invitation result = null;
             if (inviteId != Guid.Empty)
@@ -63,7 +63,7 @@ namespace TicTacToeSignalR
             return result;
         }
 
-        public InviteStatus IsValidInvite(Invitation newInvitation)
+        public static InviteStatus IsValidInvite(Invitation newInvitation)
         {
             if (HasPendingAnswers(newInvitation.From))
             {
@@ -100,14 +100,14 @@ namespace TicTacToeSignalR
         }
 
         #region Validation Methods
-        private bool HasPendingInvites(Player player)
+        private static bool HasPendingInvites(Player player)
         {
             if (player == null) return false;
 
             return _invitations.Where(inv => inv.From.Equals(player)).Any();
         }
 
-        private bool HasPendingAnswers(Player player)
+        private static bool HasPendingAnswers(Player player)
         {
             if (player == null) return false;
 

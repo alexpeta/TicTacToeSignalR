@@ -9,7 +9,7 @@ namespace TicTacToeSignalR
     public class Player : IEquatable<Player>
     {
         private string _nick;
-        private Guid _id;
+        private string _id;
         private string _avatar;
 
         public string Nick
@@ -17,7 +17,7 @@ namespace TicTacToeSignalR
             get { return _nick; }
             set { _nick = value; }
         }
-        public Guid Id
+        public string Id
         {
             get { return _id; }
             set { _id = value; }
@@ -34,13 +34,10 @@ namespace TicTacToeSignalR
         }
 
         #region Constructors
-        public Player() : this(string.Empty,Guid.Empty,string.Empty)
+        public Player() : this(string.Empty,string.Empty,string.Empty)
         {
         }
-        public Player(string nick, string id,string avatar) : this(nick,Guid.Parse(id),avatar)
-        {
-        }
-        public Player(string nick, Guid id,string avatar)
+        public Player(string nick, string id,string avatar)
         {
             Nick = nick;
             Id = id;

@@ -7,33 +7,28 @@ using System.Web;
 
 namespace TicTacToeSignalR.Core.Mechanics
 {
-    public class GameManager
+    public static class GameManager
     {
         private static ConcurrentDictionary<Guid, Game> _games = new ConcurrentDictionary<Guid, Game>();
         
-        public GameManager()
+        static GameManager()
         {
         }
 
-        private string RenderBoard(Game game, char piece)
+        private static string RenderBoard(Game game, char piece)
         {
             if (game == null || game.Board == null) return string.Empty;
 
             StringBuilder sb = new StringBuilder();
             sb.Append(string.Format(@"<table class=""board"" data-id=""{0}"">",game.GameId));
+            int k = 0;
             for (int i = 0; i < Game.Dimension; i++)
             {
                 sb.Append(@"<tr>");
                 for (int j = 0; j < Game.Dimension; j++)
                 {
-                    if (!char.IsWhiteSpace(game.Board[i, j]) && game.Board[i, j] != Char.MinValue)
-                    {
-                        sb.Append(string.Format(@"<td><a href=""javascript:alert('set value');"" class=""tile {0}"" data-x=""{1}"" data-y=""{2}"" data-allowed=""{3}""></a></td>", "selected" + game.Board[i, j], i, j, false));
-                    }
-                    else
-                    {
-                        sb.Append(string.Format(@"<td><a href=""javascript:alert('set value');"" class=""tile {0}"" data-x=""{1}"" data-y=""{2}"" data-allowed=""{3}""></a></td>", piece, i, j, true));
-                    }
+                    sb.Append(string.Format(@"<td><a href=""javascript:$.connection.gameHub.client.callMovePiece('{1}','{2}','{0}','cell{4}');"" class=""tile {0}"" data-x=""{1}"" data-y=""{2}"" data-allowed=""{3}"" id=""cell{4}""></a></td>", piece, i, j, true, k++));
+                    //sb.Append(string.Format(@"<td><a href=""#"" class=""tile {0}"" data-x=""{1}"" data-y=""{2}"" data-allowed=""{3}""></a></td>", piece, i, j, true));
                 }
                 sb.Append(@"</tr>");
             }
@@ -43,7 +38,7 @@ namespace TicTacToeSignalR.Core.Mechanics
         }
 
         #region Public Methods
-        public Game CreateGame(Invitation invite)
+        public static Game CreateGame(Invitation invite)
         {
             Game result = null;
             if (invite != null)
@@ -56,7 +51,7 @@ namespace TicTacToeSignalR.Core.Mechanics
             }
             return result;
         }
-        public string GetBoardMarkup(Guid gameId, Guid playerId)
+        public static string GetBoardMarkup(Guid gameId, string playerId)
         {
             Game game = null;
             bool gotValue = _games.TryGetValue(gameId, out game);
@@ -64,11 +59,11 @@ namespace TicTacToeSignalR.Core.Mechanics
             {
                 if (game.Player1 != null && game.Player1.Id == playerId)
                 {
-                    return this.RenderBoard(game, 'x');
+                    return GameManager.RenderBoard(game, 'x');
                 }
                 else if (game.Player2 != null && game.Player2.Id == playerId)
                 {
-                    return this.RenderBoard(game, 'o');
+                    return GameManager.RenderBoard(game, 'o');
                 }
                 else
                 {
@@ -80,7 +75,7 @@ namespace TicTacToeSignalR.Core.Mechanics
                 return "Error loading board";
             }
         }
-        public Game GetGameById(Guid gameId)
+        public static Game GetGameById(Guid gameId)
         {
             Game result = Game.Null;
             if (_games.ContainsKey(gameId))
@@ -88,6 +83,14 @@ namespace TicTacToeSignalR.Core.Mechanics
                 bool gotGame = _games.TryGetValue(gameId,out result);
             }
             return result;
+        }
+        public static void AddGameMove(Guid gameId, Movement move,string playerId)
+        {
+            Game currentGame = GameManager.GetGameById(gameId);
+            if (currentGame != null)
+            {
+                currentGame.AddMove(move, playerId);
+            }
         }
         #endregion
     }

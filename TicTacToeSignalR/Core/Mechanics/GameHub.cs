@@ -12,32 +12,12 @@ namespace TicTacToeSignalR.Core.Mechanics
     public class GameHub : Hub
     {
         #region Static
-        private static ConcurrentDictionary<Guid, Player> _lobby = new ConcurrentDictionary<Guid, Player>();
-        #endregion
-
-        #region Private properties
-        private InviteManager _inviteMananger;
-        private GameManager _gameManager;
-        #endregion
-
-        #region Public Properties
-        public InviteManager HubInviteManager
-        {
-            get { return _inviteMananger; }
-            set { _inviteMananger = value; }
-        }
-        public GameManager HubGameManager
-        {
-            get { return _gameManager; }
-            set { _gameManager = value; }
-        }
+        private static ConcurrentDictionary<string, Player> _lobby = new ConcurrentDictionary<string, Player>();
         #endregion
 
         #region Constructors
         public GameHub()
         {
-            HubInviteManager = new InviteManager();
-            HubGameManager = new GameManager();
         }
         #endregion
 
@@ -47,7 +27,7 @@ namespace TicTacToeSignalR.Core.Mechanics
         {
             if (inviteId != Guid.Empty)
             {
-                Invitation sentInvite = HubInviteManager.GetInvitationByInvitationId(inviteId);
+                Invitation sentInvite = InviteManager.GetInvitationByInvitationId(inviteId);
                 //HubInviteManager.RemoveInvite(inviteId);
                 Clients.Client(sentInvite.From.Id.ToString()).test(string.Format("Your invite to {0} has expired.",sentInvite.From.Nick));
             }
@@ -59,8 +39,8 @@ namespace TicTacToeSignalR.Core.Mechanics
                 //TODO: make this more robust.
                 Clients.Caller.test("Error sending response.");
             }
-            InviteStatus status = HubInviteManager.ValidateAnswer(answer);
-            Invitation invitation = HubInviteManager.ExtractInvite(answer.InviteId);
+            InviteStatus status = InviteManager.ValidateAnswer(answer);
+            Invitation invitation = InviteManager.ExtractInvite(answer.InviteId);
 
             switch (status.StatusType)
             {
@@ -76,16 +56,15 @@ namespace TicTacToeSignalR.Core.Mechanics
                 case InviteStatusType.Accepted:
                 default:
                     //create the new game
-                    Game game = HubGameManager.CreateGame(invitation);
-                    
-                    //TODO : make the move event work
-                    //game.PlayerHasMoved -= OnPlayerHasMoved(game,new EventArgs());
+                    Game game = GameManager.CreateGame(invitation);
+                    game.PlayerHasMovedPiece -= OnPlayerHasMovedPiece;
+                    game.PlayerHasMovedPiece += OnPlayerHasMovedPiece;
 
                     if (game != null)
                     {
                         //start the game for the players.
-                        Clients.Client(game.Player1.Id.ToString()).clientRenderBoard(HubGameManager.GetBoardMarkup(game.GameId, game.Player1.Id));
-                        Clients.Client(game.Player2.Id.ToString()).clientRenderBoard(HubGameManager.GetBoardMarkup(game.GameId, game.Player2.Id));
+                        Clients.Client(game.Player1.Id.ToString()).clientRenderBoard(GameManager.GetBoardMarkup(game.GameId, game.Player1.Id));
+                        Clients.Client(game.Player2.Id.ToString()).clientRenderBoard(GameManager.GetBoardMarkup(game.GameId, game.Player2.Id));
                     }
                     else
                     {
@@ -101,8 +80,7 @@ namespace TicTacToeSignalR.Core.Mechanics
         }
         public void InviteToPlay(Invitation invitation)
         {
-            InviteStatus status = HubInviteManager.IsValidInvite(invitation);
-            //HubInviteManager.AddInvite(invitation);
+            InviteStatus status = InviteManager.IsValidInvite(invitation);
             switch (status.StatusType)
             {
                 case InviteStatusType.Invalid:
@@ -115,7 +93,10 @@ namespace TicTacToeSignalR.Core.Mechanics
                     break;
             }
         }
-
+        public void CallMovePiece(Guid gameId, Movement move, string playerId)
+        {
+            GameManager.AddGameMove(gameId, move, playerId);
+        }
         public void GetConnectedPlayers()
         {
             var playersList = _lobby.Values.ToList();
@@ -123,9 +104,12 @@ namespace TicTacToeSignalR.Core.Mechanics
         }
 
         #region Handle Events
-        public void OnPlayerHasMoved(object sender, EventArgs e)
+        public void OnPlayerHasMovedPiece(object sender, NotificationEventArgs<Movement> e)
         {
-
+            if (e != null)
+            {
+                Clients.Client(e.ClientId).movePiece(e.Message, e.Value);
+            }
         }
         #endregion Handle Events
 
@@ -134,10 +118,8 @@ namespace TicTacToeSignalR.Core.Mechanics
         {
             try
             {
-                Guid guid = Guid.Parse(this.Context.ConnectionId);
                 Player toRemove = null;
-                bool hasBeenRemoved = _lobby.TryRemove(guid, out toRemove);
-
+                bool hasBeenRemoved = _lobby.TryRemove(this.Context.ConnectionId, out toRemove);
                 return Task.Factory.StartNew(() => GetConnectedPlayers());
             }
             catch

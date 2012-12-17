@@ -160,6 +160,7 @@
     <Compile Include="Core\Mechanics\InviteManager.cs" />
     <Compile Include="Core\Enums\InviteStatusType.cs" />
     <Compile Include="Core\Mechanics\InviteStatus.cs" />
+    <Compile Include="Core\Mechanics\NotificationEventArgs.cs" />
     <Compile Include="Core\Repository\GameRepository.cs" />
     <Compile Include="Core\Repository\PlayerRepository.cs" />
     <Compile Include="Global.asax.cs">
@@ -199,6 +200,7 @@
     <Content Include="Content\avatars\IDR_PROFILE_AVATAR_7.png" />
     <Content Include="Content\avatars\IDR_PROFILE_AVATAR_8.png" />
     <Content Include="Content\avatars\IDR_PROFILE_AVATAR_9.png" />
+    <Content Include="Content\themes\base\images\bg.png" />
     <Content Include="Content\themes\base\images\o.png" />
     <Content Include="Content\themes\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />
     <Content Include="Content\themes\base\images\ui-bg_flat_75_ffffff_40x100.png" />
