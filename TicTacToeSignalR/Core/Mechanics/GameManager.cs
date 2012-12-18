@@ -28,7 +28,6 @@ namespace TicTacToeSignalR.Core.Mechanics
                 for (int j = 0; j < Game.Dimension; j++)
                 {
                     sb.Append(string.Format(@"<td><a href=""javascript:$.connection.gameHub.client.callMovePiece('{1}','{2}','{0}','cell{4}');"" class=""tile {0}"" data-x=""{1}"" data-y=""{2}"" data-allowed=""{3}"" id=""cell{4}""></a></td>", piece, i, j, true, k++));
-                    //sb.Append(string.Format(@"<td><a href=""#"" class=""tile {0}"" data-x=""{1}"" data-y=""{2}"" data-allowed=""{3}""></a></td>", piece, i, j, true));
                 }
                 sb.Append(@"</tr>");
             }
@@ -38,6 +37,20 @@ namespace TicTacToeSignalR.Core.Mechanics
         }
 
         #region Public Methods
+        public static List<Player> GetPlayersListByGameId(Guid gameId)
+        {
+            List<Player> result = new List<Player>();
+            if (gameId != Guid.Empty)
+            {
+                Game game = GetGameById(gameId);
+                if(game != null)
+                {
+                    result.Add(game.Player1);
+                    result.Add(game.Player2);
+                }
+            }
+            return result;
+        }
         public static Game CreateGame(Invitation invite)
         {
             Game result = null;

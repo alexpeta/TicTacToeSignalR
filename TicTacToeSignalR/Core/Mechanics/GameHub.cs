@@ -62,9 +62,19 @@ namespace TicTacToeSignalR.Core.Mechanics
 
                     if (game != null)
                     {
+                        Player p1 = null;
+                        Player p2 = null;
+                        _lobby.TryRemove(game.Player1.Id, out p1);
+                        _lobby.TryRemove(game.Player2.Id, out p2);
+                        p1 = null;
+                        p2 = null;
+                        GetConnectedPlayers();
+
                         //start the game for the players.
-                        Clients.Client(game.Player1.Id.ToString()).clientRenderBoard(GameManager.GetBoardMarkup(game.GameId, game.Player1.Id));
-                        Clients.Client(game.Player2.Id.ToString()).clientRenderBoard(GameManager.GetBoardMarkup(game.GameId, game.Player2.Id));
+                        List<Player> gamePlayers = GameManager.GetPlayersListByGameId(game.GameId);
+                        Clients.Client(game.Player1.Id.ToString()).clientRenderBoard(GameManager.GetBoardMarkup(game.GameId, game.Player1.Id), gamePlayers);
+                        Clients.Client(game.Player2.Id.ToString()).clientRenderBoard(GameManager.GetBoardMarkup(game.GameId, game.Player2.Id), gamePlayers);
+
                     }
                     else
                     {

@@ -2,66 +2,6 @@
 @{
     ViewBag.Title = "Welcome";
 }
-<style type="text/css">
-    #manage-profile {
-        font-family: 'Segoe UI', Tahoma, sans-serif;
-        width: 452px;
-        padding:10px;
-        -webkit-border-radius: 3px;
-        border-radius:3px;
-        background: white;
-        box-shadow: 0 4px 23px 5px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0, 0, 0, 0.15);
-    }
-    #manage-profile h1{
-        -webkit-padding-end: 24px;
-        -webkit-user-select: none;
-        color: #333;
-        font-size: 120%;
-        margin: 0;
-        padding-bottom:15px;
-        text-shadow: white 0 1px 2px;   
-        font-weight:normal;     
-    }
-    #manage-profile ul {
-        list-style-type : none;
-        padding:0;
-        margin:0px;
-    }
-    #manage-profile ul li {
-       float:left;
-    }
-    #manage-profile .label {
-        margin-bottom:20px;
-        font-weight:normal;
-    }
-    .button {
-        border-color: rgba(0, 0, 0, 0.3);
-        box-shadow: 0 1px 0 rgba(0, 0, 0, 0.12), inset 0 1px 2px rgba(255, 255, 255, 0.95);
-        color: black;
-        border: 1px solid rgba(0, 0, 0, 0.25);
-        border-radius: 2px;
-        box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08), inset 0 1px 2px rgba(255, 255, 255, 0.75);
-        color: #444;
-        font: inherit;
-        margin: 0 1px 0 0;
-        text-shadow: 0 1px 0 #F0F0F0;
-        cursor:pointer;
-    }
-    #avatars li a {
-        margin:0px;
-        padding:2px;
-        width:38px;
-        height:31px;
-        display:block;
-    }
-    #avatars li a:hover {
-        background-color:#ff006e;
-    }
-    #avatars li a.selected {
-        background-color:#0094ff;
-    }
-    
-</style>
 
 <script type="text/javascript">
     function selectAvatar(name) {
@@ -73,24 +13,25 @@
     }
 </script>
 
-<div id="manage-profile" class="page" style="margin-left:auto;margin-right:auto;">
+<div class="box" style="margin-left:auto;margin-right:auto;">
     <h1>Create Player Profile</h1>
     <div class="label">Choose a picture and name:</div>
     <div>
         <ul id="avatars">
             @foreach (var pic in Model.AvatarsList)
             {
+                var path = @"\Content\avatars\"+pic+".png";
                 <li>
                     @if(Model.Avatar == pic)
-                    {
+                    {                        
                         <a href="javascript:selectAvatar('@pic');" data-id="@pic" class="selected">
-                            <img src="\Content\avatars\@pic" title="Choose an avatar" style="border:0px;" />
+                            <img src="@path" title="Choose an avatar" style="border:0px;" />
                         </a>
                     }
                     else
                     {
                         <a href="javascript:selectAvatar('@pic');" data-id="@pic">
-                            <img src="\Content\avatars\@pic" title="Choose an avatar" style="border:0px;" />
+                            <img src="@path" title="Choose an avatar" style="border:0px;" />
                         </a>
                     }
                 </li>

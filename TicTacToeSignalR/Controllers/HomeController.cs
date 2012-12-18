@@ -51,7 +51,7 @@ namespace TicTacToeSignalR.Controllers
                         bool conversion = int.TryParse(f.Name.Replace("IDR_PROFILE_AVATAR_", "").Replace(".png", ""),out result);
                         return result;
                     })
-                .Select(f => f.Name)
+                .Select(f => f.Name.Replace(".png", ""))
                 //.Select(f => @"\Content\avatars\"+f.Name )
                 .ToList();
             ProfileViewModel viewModel = new ProfileViewModel(cookieNick, avatarNick, avatarsList);

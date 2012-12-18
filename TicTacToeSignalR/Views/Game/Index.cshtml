@@ -1,6 +1,6 @@
 ﻿@model TicTacToeSignalR.ViewModel.ProfileViewModel
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Tic Tac Toe Game";
 }
 <style type="text/css">
     .gameplace {
@@ -56,51 +56,31 @@
     #lobby .left-side {
         width:400px;
         float:left;
+        margin-left:10px;
+        margin-top:10px;
+        background-color:black;
     }
     #lobby .right-side {
         width:100px;
         float:left;
         border:1px solid red;
     }
-
-
-    #lobby .left-side ul{
+    ul{
         list-style-type:none;
         padding:0px;
-        margin:0px;
     }
-    #lobby .left-side ul li img{
-        vertical-align:middle;
-    }
-    #lobby .left-side ul li a {
-        text-decoration: none;
-        font-family:Tahoma;
-        font-size:18px;
-        width:260px;
-        vertical-align:middle;
+    li {
+        margin-top: 3px;
     }
     .invite {
-        margin-left:10px;
         background-color:#ff6a00;
         color:#fff;
         padding:10px;
     }
     #players-container {
-        /*background-color:#e0dcdc;*/
-        background-color: #808080;
-        border-radius:8px;
-    }
-    #players-container li {
-        padding:3px;
-        margin-bottom:1px;
-    }
-        
-    #players-container a {
-        color:white;
-        font-weight:normal;
-    }
-    #players-container a:hover {
-        background-color:#ffd800;
+        margin-left:10px;
+        margin-right:10px; 
+        margin-bottom:10px;
     }
     .invite-answer {
         background-color:#fff;
@@ -111,13 +91,23 @@
     #inviter {
         font-weight:bold;
     }
+    #game-session {
+        color:#808080;
+        margin-left: 10px;
+        margin-top: 10px;
+        width: 400px;
+    }
 </style>
 
 
 
 <div id="lobby-wrapper">
+
     <div id="lobby">
         <div class="left-side">
+            <div>
+                <h1>Lobby</h1>
+            </div>
             <ul id="players-container"></ul>
         </div>
         <div class="left-side">
@@ -126,6 +116,25 @@
             <div style="clear:left;"></div>
         </div>
         <div style="clear:left;"></div>
+    </div>
+    <div id="game-session" style="display:none;">
+         <div class="left-side">
+             <div>
+                 Game id: 123 <br />
+                 Alex : x <br />
+                 Bogdan : o
+             </div>
+        </div>
+        <div class="left-side">
+            <a href="javascript:void(0);" class="button">
+               Quit  to lobby
+            </a>
+            <a href="javascript:void(0);" class="button">
+              Surrender
+            </a>
+        </div>
+         <div style="clear:left;"></div>
+        <ul id="game-session-players"></ul>
     </div>
 </div>
 
@@ -143,14 +152,14 @@
 <script type="text/javascript">
     $(function () {
         //helpermethods
-        $('.tile[data-allowed="True"]').click(function () {
-            var self = $(this);
-            var data = {
-                xPosition: self.attr('data-x'),
-                yPosition: self.attr('data-y'),
-                PieceType: 'x'
-            };
-        });
+        //$('.tile[data-allowed="True"]').click(function () {
+        //    var self = $(this);
+        //    var data = {
+        //        xPosition: self.attr('data-x'),
+        //        yPosition: self.attr('data-y'),
+        //        PieceType: 'x'
+        //    };
+        //});
 
         //signalR
         var proxy = $.connection.gameHub;
@@ -197,9 +206,19 @@
             });
         }
 
-        proxy.client.clientRenderBoard = function (boardMarkup) {
+        proxy.client.clientRenderBoard = function (boardMarkup,playersList) {
             $('.gameplace').append(boardMarkup);
             $('.board-wrapper').css("display", "block");
+            $('#lobby').fadeOut(100);
+
+            $('#game-session-players > li').remove();
+
+            $.each(playersList, function (index, player) {
+                var str = '<li>' + player.Nick + '</li>';
+                $('#game-session-players').append(str);
+            });
+
+            $('#game-session').css('display', 'block');
         }
 
         proxy.client.showRejectedMessage = function () {
@@ -243,16 +262,14 @@
                     var appendContent = '';
                     if (player != null && player.Nick != proxy.state.name) {
                         appendContent = '<li>';
-                        appendContent += '<img src="' + player.AvatarUrl + '" style="border:0px;"/>';
                         appendContent += '<a href="javascript:$.connection.gameHub.client.inviteToPlayFromClient(';
                         appendContent += "'"+ player.Nick+"',";
                         appendContent += "'" + player.Id + "'";
-                        appendContent += ')" class="player">' + player.Nick + '</a></li>';
+                        appendContent += ')" class="'+player.Avatar+'">' + player.Nick + '</a></li>';
                     }
                     else {
                         appendContent = '<li>';
-                        appendContent += '<img src="' + player.AvatarUrl + '" style="border:0px;"/>';
-                        appendContent += '<a href="javascript:void(0)" data-id="' + player.Id + '">(o_O) ' + player.Nick + '</a></li>';
+                        appendContent += '<a href="javascript:void(0)" data-id="' + player.Id + '" class="'+player.Avatar+' selected">' + player.Nick + '</a></li>';
                     }
                     $('#players-container').append(appendContent);
                 })
