@@ -33,20 +33,25 @@
         height:120px;
         display:block;
     }
+    
+    table.board a.selectedo,
+    table.board a.selectedx {
+         cursor:not-allowed;
+    }
+    
     table.board a.selectedo,
     table.board a.o:hover {
        background-image:url("../../Content/themes/base/images/o.png");
        background-position:center center;
        background-repeat : no-repeat;
     }
+    
+    
     table.board a.selectedx,
      table.board a.x:hover {
        background-image:url("../../Content/themes/base/images/x.png");
        background-position:center center;
        background-repeat : no-repeat;
-    }
-    table.board a.invalid {
-        cursor:not-allowed;
     }
 
     #lobby {
@@ -97,9 +102,19 @@
         margin-top: 10px;
         width: 400px;
     }
+
+    .btn-holder {
+        margin:10px;
+    }
 </style>
 
 
+<div id="options">
+    <div class="btn-holder">
+        <a href="#" class="button" title="Exit game to start page">Exit Game</a>
+        <a href="#" class="button" title="Quit current game">Quit current game to lobby</a>
+    </div>
+</div>
 
 <div id="lobby-wrapper">
 
@@ -117,23 +132,7 @@
         </div>
         <div style="clear:left;"></div>
     </div>
-    <div id="game-session" style="display:none;">
-         <div class="left-side">
-             <div>
-                 Game id: 123 <br />
-                 Alex : x <br />
-                 Bogdan : o
-             </div>
-        </div>
-        <div class="left-side">
-            <a href="javascript:void(0);" class="button">
-               Quit  to lobby
-            </a>
-            <a href="javascript:void(0);" class="button">
-              Surrender
-            </a>
-        </div>
-         <div style="clear:left;"></div>
+    <div id="game-session" style="display:block;">
         <ul id="game-session-players"></ul>
     </div>
 </div>

@@ -154,6 +154,7 @@
     <Compile Include="Core\Entities\InviteAnswer.cs" />
     <Compile Include="Core\Entities\Movement.cs" />
     <Compile Include="Core\Entities\Player.cs" />
+    <Compile Include="Core\Enums\Avatars.cs" />
     <Compile Include="Core\Enums\Nicknames.cs" />
     <Compile Include="Core\Mechanics\GameHub.cs" />
     <Compile Include="Core\Mechanics\GameManager.cs" />

@@ -36,5 +36,10 @@ namespace TicTacToeSignalR
             Y = y;
             Piece = piece;
         }
+
+        public override string ToString()
+        {
+            return string.Format(@" moved piece at board[{0}][{1}] with {2}",X,Y,Piece);
+        }
     }
 }

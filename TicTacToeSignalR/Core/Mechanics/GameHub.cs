@@ -21,6 +21,12 @@ namespace TicTacToeSignalR.Core.Mechanics
         }
         #endregion
 
+        #region Statics
+        public static bool NickIsInUse(string nickToCheck)
+        {
+            return _lobby.Any(p => string.Equals(p.Value.Nick, nickToCheck, StringComparison.InvariantCultureIgnoreCase));
+        }
+        #endregion Statics
 
         #region Public Methods
         public void AutoCloseInvite(Guid inviteId)
@@ -45,11 +51,7 @@ namespace TicTacToeSignalR.Core.Mechanics
             switch (status.StatusType)
             {
                 case InviteStatusType.Invalid:
-                    Clients.All.test("invalid");
-                    break;
                 case InviteStatusType.Valid:
-                    Clients.All.test("invalid");
-                    break;
                 case InviteStatusType.Rejected:
                     Clients.Client(invitation.From.Id.ToString()).test(status.Message);
                     break;

@@ -86,13 +86,16 @@ namespace TicTacToeSignalR
         public bool AddMove(Movement move,string playerId)
         {
             Player replyTo = null;
+            Player from = null;
             if (this.Player1.Id != playerId)
             {
                 replyTo = this.Player1;
+                from = this.Player2;
             }
             else
             {
                 replyTo = this.Player2;
+                from = this.Player1;
             }
 
             if (!isValidMove(move, playerId))
@@ -102,7 +105,7 @@ namespace TicTacToeSignalR
             }
             else
             {
-                RaisePlayerHasMoved(new NotificationEventArgs<Movement>(replyTo.Id, "Move is valid!!", move));
+                RaisePlayerHasMoved(new NotificationEventArgs<Movement>(replyTo.Id, from.Nick+move.ToString(), move));
                 return true;
             }
         }

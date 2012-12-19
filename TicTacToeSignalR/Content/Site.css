@@ -773,9 +773,9 @@ tr.pager td {
         }
 }
 
-
 /* first page index */
   .box {
+        margin-top:20px;
         font-family: 'Segoe UI', Tahoma, sans-serif;
         width: 452px;
         padding:10px;
@@ -833,7 +833,7 @@ tr.pager td {
         text-shadow: 0 1px 0 #F0F0F0;
         cursor:pointer;
         text-decoration:none;
-        padding:2px;
+        padding:2px 6px;
     }
     #avatars li a {
         margin:0px;
