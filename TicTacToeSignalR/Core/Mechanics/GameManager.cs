@@ -105,6 +105,51 @@ namespace TicTacToeSignalR.Core.Mechanics
                 currentGame.AddMove(move, playerId);
             }
         }
+
+        public static Game GetGameByPlayerId(string playerId)
+        {
+            Game result = _games.Where(g=> 
+                            { 
+                                if( g.Value != null &&
+                                    ((g.Value.Player1!= null && g.Value.Player1.Id == playerId) || 
+                                    (g.Value.Player2!= null && g.Value.Player2.Id == playerId))
+                                  )
+                                {
+                                    return true;
+                                }
+                                else
+                                {
+                                    return false;
+                                }
+                            }).Select(g=>g.Value).FirstOrDefault();
+
+            return result;
+        }
+        public static Game QuitGame(Guid gameId, string playerWhoQuitsId)
+        {
+            Game game = null;
+            if (gameId != Guid.Empty)
+            {
+                game = GameManager.GetGameById(gameId);
+            }
+            else
+            {
+                //check to see wheather the player is an a game without any gameId provided.
+                game = GameManager.GetGameByPlayerId(playerWhoQuitsId);
+            }
+
+            if (game != null)
+            {
+                game.Winner = game.Player1.Id == playerWhoQuitsId ? game.Player2 : game.Player1;
+                //TODO: transfer Game entity to a persistent state.
+               _games.TryRemove(game.GameId, out game);
+            } 
+            return game;
+        }
         #endregion
+
+
+
+
     }
 }

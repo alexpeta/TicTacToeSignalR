@@ -111,8 +111,8 @@
 
 <div id="options">
     <div class="btn-holder">
-        <a href="#" class="button" title="Exit game to start page">Exit Game</a>
-        <a href="#" class="button" title="Quit current game">Quit current game to lobby</a>
+        <a href="javascript:$.connection.gameHub.client.clientExitGame()" class="button" title="Exit game to start page" id="btn-exit">Exit Game</a>
+        <a href="javascript:$.connection.gameHub.client.clientQuitToLobby()" class="button" title="Quit current game" style="display:none;" id="btn-lobby">Quit current game to lobby</a>
     </div>
 </div>
 
@@ -197,6 +197,38 @@
             });
         }
 
+        proxy.client.clientExitGame = function () {
+            var gameId = $('.board').attr('data-id');
+            proxy.server.exitGame(gameId,$.connection.gameHub.connection.id);
+        }
+        proxy.client.exitGame = function () {
+            window.location.href = "/";
+        }
+
+
+        proxy.client.clientQuitToLobby = function() {
+            var gameId = $('.board').attr('data-id');
+            proxy.server.quitToLobby(gameId, $.connection.gameHub.connection.id)
+        }
+
+        proxy.client.clientShowLobby = function() {
+            $('.gameplace').html('');
+            $('.board-wrapper').css('display', 'none');
+            $('#btn-lobby').css('display', 'none')
+            $('#lobby').fadeIn(100);
+            $('#game-session-players > li').remove();
+            $('#game-session').css('display', 'none');
+
+            proxy.server.playerJoined(
+            {
+                Nick: proxy.state.name,
+                Id: $.connection.gameHub.connection.id,
+                Avatar: proxy.state.avatar
+            });
+        }
+
+
+
         proxy.client.sendAnswer = function (id, answer) {
             $('#' + id).fadeOut(answer == true ? 0 : 200);
             proxy.server.sendInviteAnswer({
@@ -209,6 +241,7 @@
             $('.gameplace').append(boardMarkup);
             $('.board-wrapper').css("display", "block");
             $('#lobby').fadeOut(100);
+            $('#btn-lobby').css('display', 'inline')
 
             $('#game-session-players > li').remove();
 
@@ -228,16 +261,18 @@
             $('#invitation-container').append(markup);
         };
 
-        proxy.client.inviteToPlayFromClient = function (toNick,toConnId) {
+        proxy.client.inviteToPlayFromClient = function (toNick,toConnId,toAvatar) {
             proxy.server.inviteToPlay(
                 {
                     "From": {
                         "Nick": proxy.state.name,
-                        "Id": $.connection.gameHub.connection.id
+                        "Id": $.connection.gameHub.connection.id,
+                        "Avatar": proxy.state.avatar
                     },
                     "To": {
                         "Nick": toNick,
-                        "Id": toConnId
+                        "Id": toConnId,
+                        "Avatar": toAvatar
                     }
                 });
         }
@@ -263,7 +298,8 @@
                         appendContent = '<li>';
                         appendContent += '<a href="javascript:$.connection.gameHub.client.inviteToPlayFromClient(';
                         appendContent += "'"+ player.Nick+"',";
-                        appendContent += "'" + player.Id + "'";
+                        appendContent += "'" + player.Id + "',";
+                        appendContent += "'" + player.Avatar + "'";
                         appendContent += ')" class="'+player.Avatar+'">' + player.Nick + '</a></li>';
                     }
                     else {

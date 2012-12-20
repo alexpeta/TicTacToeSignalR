@@ -76,7 +76,6 @@ namespace TicTacToeSignalR.Core.Mechanics
                         List<Player> gamePlayers = GameManager.GetPlayersListByGameId(game.GameId);
                         Clients.Client(game.Player1.Id.ToString()).clientRenderBoard(GameManager.GetBoardMarkup(game.GameId, game.Player1.Id), gamePlayers);
                         Clients.Client(game.Player2.Id.ToString()).clientRenderBoard(GameManager.GetBoardMarkup(game.GameId, game.Player2.Id), gamePlayers);
-
                     }
                     else
                     {
@@ -115,6 +114,50 @@ namespace TicTacToeSignalR.Core.Mechanics
             Clients.All.refreshPlayersList(playersList);
         }
 
+        public void QuitToLobby(Guid gameId,string playerWhoQuitsId)
+        {
+            Game gameToQuit = GameManager.QuitGame(gameId, playerWhoQuitsId);
+
+            _lobby.TryAdd(gameToQuit.Player1.Id, gameToQuit.Player1);
+            _lobby.TryAdd(gameToQuit.Player2.Id, gameToQuit.Player2);
+
+            Clients.Client(gameToQuit.Player1.Id).clientShowLobby();
+            Clients.Client(gameToQuit.Player2.Id).clientShowLobby();
+        }
+
+        public void ExitGame(string gameStringId,string playerWhoQuitsId)
+        {
+            Guid gameId = Guid.Empty;
+            try
+            {
+                gameId = string.IsNullOrEmpty(gameStringId) ? Guid.Empty : Guid.Parse(gameStringId);
+            }
+            catch
+            {
+                gameId = Guid.Empty;
+            }
+
+            if (gameId != Guid.Empty)
+            {
+                Game gameToQuit = GameManager.QuitGame(gameId, playerWhoQuitsId);
+                string playerToJoinLobby = gameToQuit.Player1.Id == playerWhoQuitsId ? gameToQuit.Player2.Id : gameToQuit.Player1.Id;
+
+                Clients.Client(playerWhoQuitsId).exitGame();
+                Clients.Client(playerToJoinLobby).clientShowLobby();
+            }
+            else
+            {
+                Player player = null;
+                if (!string.IsNullOrEmpty(playerWhoQuitsId))
+                {
+                    _lobby.TryRemove(playerWhoQuitsId, out player);
+                }
+                player = null;
+                Clients.Client(playerWhoQuitsId).exitGame();
+                GetConnectedPlayers();
+            }
+        }
+
         #region Handle Events
         public void OnPlayerHasMovedPiece(object sender, NotificationEventArgs<Movement> e)
         {
@@ -128,10 +171,19 @@ namespace TicTacToeSignalR.Core.Mechanics
         #region Overrides
         public override Task OnDisconnected()
         {
+            string playerWhoExitsId = this.Context.ConnectionId;
             try
             {
                 Player toRemove = null;
-                bool hasBeenRemoved = _lobby.TryRemove(this.Context.ConnectionId, out toRemove);
+                bool hasBeenRemoved = _lobby.TryRemove(playerWhoExitsId, out toRemove);
+                if (!hasBeenRemoved)
+                {
+                    //check to see if he is in a game
+                    Game game = GameManager.QuitGame(Guid.Empty, playerWhoExitsId);
+                    string playerToJoinLobby = game.Player1.Id == playerWhoExitsId ? game.Player2.Id : game.Player1.Id;
+                    Clients.Client(playerToJoinLobby).clientShowLobby();
+                }
+
                 return Task.Factory.StartNew(() => GetConnectedPlayers());
             }
             catch

@@ -34,6 +34,9 @@ namespace TicTacToeSignalR
         }
 
         #region Constructors
+        public Player(Player other):this(other.Nick,other.Id,other.Avatar)
+        {
+        }
         public Player() : this(string.Empty,string.Empty,string.Empty)
         {
         }
@@ -79,5 +82,7 @@ namespace TicTacToeSignalR
 
             return sb.ToString();
         }
+
+
     }
 }

@@ -13,6 +13,7 @@ namespace TicTacToeSignalR
         private Guid _gameId;
         private Player _player1;
         private Player _player2;
+        private Player _winner;
         private char[,] _board;
         private List<Movement> _moves;
         #endregion
@@ -32,6 +33,11 @@ namespace TicTacToeSignalR
             get { return _player2; }
             set { _player2 = value; }
         }
+        public Player Winner
+        {
+            get { return _winner; }
+            set { _winner = value; }
+        }
         public char[,] Board
         {
             get { return _board; }
@@ -44,7 +50,6 @@ namespace TicTacToeSignalR
         //}
 
         public event EventHandler<NotificationEventArgs<Movement>> PlayerHasMovedPiece;
-
         private void RaisePlayerHasMoved(NotificationEventArgs<Movement> e)
         {
             var handler = PlayerHasMovedPiece;
@@ -70,6 +75,7 @@ namespace TicTacToeSignalR
             Board = board;
             Player1 = p1;
             Player2 = p2;
+            Winner = null;
             _moves = moves;
 	    }
         #endregion
