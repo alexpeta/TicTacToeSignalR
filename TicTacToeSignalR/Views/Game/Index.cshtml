@@ -3,9 +3,12 @@
     ViewBag.Title = "Tic Tac Toe Game";
 }
 <style type="text/css">
-    .gameplace {
+    #gameplace {
         float:left;
         width:400px;
+    }
+    .wait {
+        cursor:wait;
     }
     .summary {
         float:left;
@@ -28,7 +31,7 @@
         margin:0px;
         border:1px solid black;
     }
-    table.board a.tile {
+    table.board a {
         width:120px;
         height:120px;
         display:block;
@@ -140,7 +143,7 @@
 
 <div class="board-wrapper" style="display:none;">
     <h2></h2>
-    <div class="gameplace">
+    <div id="gameplace">
     </div>
     <div class="summary">        
     </div>
@@ -150,16 +153,6 @@
 
 <script type="text/javascript">
     $(function () {
-        //helpermethods
-        //$('.tile[data-allowed="True"]').click(function () {
-        //    var self = $(this);
-        //    var data = {
-        //        xPosition: self.attr('data-x'),
-        //        yPosition: self.attr('data-y'),
-        //        PieceType: 'x'
-        //    };
-        //});
-
         //signalR
         var proxy = $.connection.gameHub;
         proxy.state.name = '@Model.Nick';
@@ -175,6 +168,7 @@
             selectedCell.removeAttr('href');
             selectedCell.removeClass(paramPiece).addClass('selected' + paramPiece);
 
+
             //preparing what to send to the server
             var move = {
                 x: px,
@@ -184,10 +178,28 @@
             var gameId = $('.board').attr('data-id');
             var playerId = $.connection.gameHub.connection.id;
             proxy.server.callMovePiece(gameId, move, playerId);
+            //$('#gameplace').addClass('wait');
         }
 
         proxy.client.movePiece = function (message, movement) {
+            var pieces = $('.board td a');
+            if (pieces != null)
+            {
+                $.each(pieces, function (index, p) {
+                    var selectedCellId = p.getAttribute('id');
+                    var x = p.getAttribute('data-x');
+                    var y = p.getAttribute('data-y');
+                    if (movement.X == x && movement.Y == y) {
+
+                        var selectedCell = $('#' + selectedCellId);
+
+                        selectedCell.removeAttr('href');
+                        selectedCell.removeClass().addClass('selected' + movement.Piece);
+                    }
+                });
+            }
             proxy.client.appendSummary(message);
+            //$('#gameplace').removeClass('wait');
         }
 
         proxy.client.startGame = function() {
@@ -212,7 +224,7 @@
         }
 
         proxy.client.clientShowLobby = function() {
-            $('.gameplace').html('');
+            $('#gameplace').html('');
             $('.board-wrapper').css('display', 'none');
             $('#btn-lobby').css('display', 'none')
             $('#lobby').fadeIn(100);
@@ -238,7 +250,7 @@
         }
 
         proxy.client.clientRenderBoard = function (boardMarkup,playersList) {
-            $('.gameplace').append(boardMarkup);
+            $('#gameplace').append(boardMarkup);
             $('.board-wrapper').css("display", "block");
             $('#lobby').fadeOut(100);
             $('#btn-lobby').css('display', 'inline')
