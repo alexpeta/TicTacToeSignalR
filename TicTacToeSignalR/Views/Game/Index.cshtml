@@ -6,14 +6,16 @@
     #gameplace {
         float:left;
         width:400px;
+        padding-left:10px;
     }
     .wait {
         cursor:wait;
     }
     .summary {
+        background-color:#ccc;
         float:left;
         width:400px;
-        border:0.5px dotted black;    
+        padding:5px;  
     }
     .board-wrapper {
         width:100%;
@@ -29,7 +31,7 @@
     table.board td {
         padding:0px;
         margin:0px;
-        border:1px solid black;
+        border:1px solid grey;
     }
     table.board a {
         width:120px;
@@ -47,6 +49,7 @@
        background-image:url("../../Content/themes/base/images/o.png");
        background-position:center center;
        background-repeat : no-repeat;
+       background-color:#E48600;
     }
     
     
@@ -55,6 +58,7 @@
        background-image:url("../../Content/themes/base/images/x.png");
        background-position:center center;
        background-repeat : no-repeat;
+       background-color:#91AB31;
     }
 
     #lobby {
@@ -109,6 +113,18 @@
     .btn-holder {
         margin:10px;
     }
+
+    .player2, .player1 {
+        background-color:black;
+    }
+    .player2 {
+        background-color:none;
+        color:#E48600;
+    }
+    .player1 {
+        background-color:none;
+        color:#91AB31;
+    }
 </style>
 
 
@@ -116,6 +132,7 @@
     <div class="btn-holder">
         <a href="javascript:$.connection.gameHub.client.clientExitGame()" class="button" title="Exit game to start page" id="btn-exit">Exit Game</a>
         <a href="javascript:$.connection.gameHub.client.clientQuitToLobby()" class="button" title="Quit current game" style="display:none;" id="btn-lobby">Quit current game to lobby</a>
+        <a href="#" class="button" id="btn-edit-profile">Settings</a>
     </div>
 </div>
 
@@ -162,12 +179,24 @@
             alert(data);
         }
         
+        proxy.client.notify = function (n) {
+            $('#notification-panel').removeClass().addClass(n.Type);
+            $('#notifcation-message').html(n.Message);
+            $('#notification-panel').fadeIn(300);
+        }
+
+
         proxy.client.callMovePiece = function (px,py,paramPiece,cellId) {
             //making selection for current player
             var selectedCell = $('#' + cellId);
             selectedCell.removeAttr('href');
             selectedCell.removeClass(paramPiece).addClass('selected' + paramPiece);
 
+            var notification = {
+                Message: 'Wait for the other player to move!',
+                Type: 'red'
+            };
+            proxy.client.notify(notification);
 
             //preparing what to send to the server
             var move = {
@@ -177,8 +206,7 @@
             };
             var gameId = $('.board').attr('data-id');
             var playerId = $.connection.gameHub.connection.id;
-            proxy.server.callMovePiece(gameId, move, playerId);
-            //$('#gameplace').addClass('wait');
+            proxy.server.serverCallMovePiece(gameId, move, playerId);
         }
 
         proxy.client.movePiece = function (message, movement) {
@@ -198,8 +226,13 @@
                     }
                 });
             }
+
+            var notification = {
+                Message: 'Your move!',
+                Type: 'green'
+            };
+            proxy.client.notify(notification);
             proxy.client.appendSummary(message);
-            //$('#gameplace').removeClass('wait');
         }
 
         proxy.client.startGame = function() {
@@ -238,9 +271,7 @@
                 Avatar: proxy.state.avatar
             });
         }
-
-
-
+        
         proxy.client.sendAnswer = function (id, answer) {
             $('#' + id).fadeOut(answer == true ? 0 : 200);
             proxy.server.sendInviteAnswer({
@@ -249,7 +280,7 @@
             });
         }
 
-        proxy.client.clientRenderBoard = function (boardMarkup,playersList) {
+        proxy.client.clientRenderBoard = function (boardMarkup,game) {
             $('#gameplace').append(boardMarkup);
             $('.board-wrapper').css("display", "block");
             $('#lobby').fadeOut(100);
@@ -257,10 +288,14 @@
 
             $('#game-session-players > li').remove();
 
-            $.each(playersList, function (index, player) {
-                var str = '<li>' + player.Nick + '</li>';
-                $('#game-session-players').append(str);
-            });
+            if (game != null) {
+                if (game.Player1 != null) {
+                    $('#game-session-players').append('<li class="player1 '+game.Player1.Avatar+'">' + game.Player1.Nick + '</li>');
+                }
+                if (game.Player2 != null) {
+                    $('#game-session-players').append('<li class="player2 ' + game.Player2.Avatar + '">' + game.Player2.Nick + '</li>');
+                }
+            }
 
             $('#game-session').css('display', 'block');
         }
@@ -287,6 +322,13 @@
                         "Avatar": toAvatar
                     }
                 });
+        }
+
+        proxy.client.refreshSummary = function(data) {
+            $('.summary > div').remove();
+            $.each(data, function (index, val) {
+                $('.summary').append('<div>' + val + '</div>');
+            });
         }
 
         proxy.client.appendSummary = function (data) {
@@ -316,7 +358,7 @@
                     }
                     else {
                         appendContent = '<li>';
-                        appendContent += '<a href="javascript:void(0)" data-id="' + player.Id + '" class="'+player.Avatar+' selected">' + player.Nick + '</a></li>';
+                        appendContent += '<a href="javascript:void(0)" data-id="' + player.Id + '" class="'+player.Avatar+' selected" title="Its you!">' + player.Nick + '</a></li>';
                     }
                     $('#players-container').append(appendContent);
                 })

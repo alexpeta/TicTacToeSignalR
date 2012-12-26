@@ -154,8 +154,10 @@
     <Compile Include="Core\Entities\InviteAnswer.cs" />
     <Compile Include="Core\Entities\Movement.cs" />
     <Compile Include="Core\Entities\Player.cs" />
+    <Compile Include="Core\Entities\UserNotification.cs" />
     <Compile Include="Core\Enums\Avatars.cs" />
     <Compile Include="Core\Enums\Nicknames.cs" />
+    <Compile Include="Core\Enums\UserNotificationType.cs" />
     <Compile Include="Core\Mechanics\GameHub.cs" />
     <Compile Include="Core\Mechanics\GameManager.cs" />
     <Compile Include="Core\Mechanics\InviteManager.cs" />
@@ -171,6 +173,7 @@
     <Compile Include="Models\GameDataContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utility\CookieManager.cs" />
+    <Compile Include="Utility\Extensions.cs" />
     <Compile Include="ViewModel\GameViewModel.cs" />
     <Compile Include="ViewModel\ProfileViewModel.cs" />
   </ItemGroup>
@@ -216,7 +219,7 @@
     <Content Include="Content\themes\base\images\ui-icons_454545_256x240.png" />
     <Content Include="Content\themes\base\images\ui-icons_888888_256x240.png" />
     <Content Include="Content\themes\base\images\ui-icons_cd0a0a_256x240.png" />
-    <Content Include="Content\themes\base\images\X.png" />
+    <Content Include="Content\themes\base\images\x.png" />
     <Content Include="Content\themes\base\jquery.ui.accordion.css" />
     <Content Include="Content\themes\base\jquery.ui.all.css" />
     <Content Include="Content\themes\base\jquery.ui.autocomplete.css" />

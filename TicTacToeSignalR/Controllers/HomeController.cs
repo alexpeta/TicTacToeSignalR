@@ -45,28 +45,26 @@ namespace TicTacToeSignalR.Controllers
 
         public ActionResult Index()
         {
-
             string cookieNick = string.Empty;
             string avatarNick = string.Empty;
 
-            if (CookieManager.CheckCookie(this.HttpContext, CookieManager.UserCookieName))
+            if (this.HttpContext.HasCookie(CookieManager.UserCookieName))
             {
-                cookieNick = CookieManager.CookieValue;
+                cookieNick = this.HttpContext.GetCookieValue(CookieManager.UserCookieName);
             }
             else
             {
                 cookieNick = NicknamesHelper.GetRandomNick();
             }
 
-            if (CookieManager.CheckCookie(this.HttpContext, CookieManager.AvatarCookieName))
+            if (this.HttpContext.HasCookie(CookieManager.AvatarCookieName))
             {
-                avatarNick = CookieManager.CookieValue;
+                avatarNick = this.HttpContext.GetCookieValue(CookieManager.AvatarCookieName);
             }
             else
             {
                 avatarNick = AvatarsHelper.GetRandomAvatar();
             }
-
 
             ProfileViewModel viewModel = new ProfileViewModel(cookieNick, avatarNick, this.GetAvatarList());
 
@@ -85,8 +83,8 @@ namespace TicTacToeSignalR.Controllers
             }
             else
             {
-                CookieManager.WriteCoockie(this.HttpContext, CookieManager.UserCookieName, profile.Nick);
-                CookieManager.WriteCoockie(this.HttpContext, CookieManager.AvatarCookieName, profile.Avatar);
+                CookieManager.WriteCookie(this.HttpContext, CookieManager.UserCookieName, profile.Nick);
+                CookieManager.WriteCookie(this.HttpContext, CookieManager.AvatarCookieName, profile.Avatar);
                 TempData["profileData"] = profile;
                 return RedirectToAction("Index", "Game");
             }

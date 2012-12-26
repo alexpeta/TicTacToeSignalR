@@ -9,24 +9,25 @@ using TicTacToeSignalR.Models;
 
 namespace TicTacToeSignalR.Core.Mechanics
 {
+    /// <summary>
+    /// Provides the JSON-RPC layer that facilitates communication
+    /// between client and server
+    /// </summary>
     public class GameHub : Hub
     {
-        #region Static
+        #region Statics
         private static ConcurrentDictionary<string, Player> _lobby = new ConcurrentDictionary<string, Player>();
-        #endregion
+        public static bool NickIsInUse(string nickToCheck)
+        {
+            return _lobby.Any(p => string.Equals(p.Value.Nick, nickToCheck, StringComparison.InvariantCultureIgnoreCase));
+        }
+        #endregion Statics
 
         #region Constructors
         public GameHub()
         {
         }
         #endregion
-
-        #region Statics
-        public static bool NickIsInUse(string nickToCheck)
-        {
-            return _lobby.Any(p => string.Equals(p.Value.Nick, nickToCheck, StringComparison.InvariantCultureIgnoreCase));
-        }
-        #endregion Statics
 
         #region Public Methods
         public void AutoCloseInvite(Guid inviteId)
@@ -59,8 +60,11 @@ namespace TicTacToeSignalR.Core.Mechanics
                 default:
                     //create the new game
                     Game game = GameManager.CreateGame(invitation);
-                    game.PlayerHasMovedPiece -= OnPlayerHasMovedPiece;
+
+                    //lets subscribe to game stuff here
                     game.PlayerHasMovedPiece += OnPlayerHasMovedPiece;
+                    game.ErrorOccurred += OnErrorOccured;
+                    game.UpdateSummary += OnUpdateSummary;
 
                     if (game != null)
                     {
@@ -73,9 +77,9 @@ namespace TicTacToeSignalR.Core.Mechanics
                         GetConnectedPlayers();
 
                         //start the game for the players.
-                        List<Player> gamePlayers = GameManager.GetPlayersListByGameId(game.GameId);
-                        Clients.Client(game.Player1.Id.ToString()).clientRenderBoard(GameManager.GetBoardMarkup(game.GameId, game.Player1.Id), gamePlayers);
-                        Clients.Client(game.Player2.Id.ToString()).clientRenderBoard(GameManager.GetBoardMarkup(game.GameId, game.Player2.Id), gamePlayers);
+                        //List<Player> gamePlayers = GameManager.GetPlayersListByGameId(game.GameId);
+                        Clients.Client(game.Player1.Id.ToString()).clientRenderBoard(GameManager.GetBoardMarkup(game.GameId, game.Player1.Id), game);
+                        Clients.Client(game.Player2.Id.ToString()).clientRenderBoard(GameManager.GetBoardMarkup(game.GameId, game.Player2.Id), game);
                     }
                     else
                     {
@@ -84,6 +88,7 @@ namespace TicTacToeSignalR.Core.Mechanics
                     break;
             }
         }
+
         public void PlayerJoined(Player johnDoe)
         {
             _lobby.TryAdd(johnDoe.Id, johnDoe);
@@ -91,38 +96,45 @@ namespace TicTacToeSignalR.Core.Mechanics
         }
         public void InviteToPlay(Invitation invitation)
         {
-            InviteStatus status = InviteManager.IsValidInvite(invitation);
-            switch (status.StatusType)
+            if (invitation != null)
             {
-                case InviteStatusType.Invalid:
-                case InviteStatusType.Rejected:
-                    Clients.Client(invitation.From.Id.ToString()).test(status.Message);
-                    break;
-                case InviteStatusType.Valid:
-                default:
-                    Clients.Client(invitation.To.Id.ToString()).showInviteModal(invitation.InviteToMarkup());
-                    break;
+                invitation.ErrorOccurred -= OnErrorOccured;
+                invitation.ErrorOccurred += OnErrorOccured;
+                InviteStatus status = InviteManager.IsValidInvite(invitation);
+                switch (status.StatusType)
+                {
+                    case InviteStatusType.Invalid:
+                    case InviteStatusType.Rejected:
+                        Clients.Client(invitation.From.Id.ToString()).test(status.Message);
+                        break;
+                    case InviteStatusType.Valid:
+                    default:
+                        Clients.Client(invitation.To.Id.ToString()).showInviteModal(invitation.InviteToMarkup());
+                        break;
+                }
             }
         }
-        public void CallMovePiece(Guid gameId, Movement move, string playerId)
+        public void ServerCallMovePiece(Guid gameId, Movement move, string playerId)
         {
             GameManager.AddGameMove(gameId, move, playerId);
         }
         public void GetConnectedPlayers()
         {
-            var playersList = _lobby.Values.ToList();
+            var playersList = _lobby.Values.OrderBy(p=>p.Nick).ToList();
             Clients.All.refreshPlayersList(playersList);
         }
 
         public void QuitToLobby(Guid gameId,string playerWhoQuitsId)
         {
             Game gameToQuit = GameManager.QuitGame(gameId, playerWhoQuitsId);
+            if (gameToQuit != null)
+            {
+                _lobby.TryAdd(gameToQuit.Player1.Id, gameToQuit.Player1);
+                _lobby.TryAdd(gameToQuit.Player2.Id, gameToQuit.Player2);
 
-            _lobby.TryAdd(gameToQuit.Player1.Id, gameToQuit.Player1);
-            _lobby.TryAdd(gameToQuit.Player2.Id, gameToQuit.Player2);
-
-            Clients.Client(gameToQuit.Player1.Id).clientShowLobby();
-            Clients.Client(gameToQuit.Player2.Id).clientShowLobby();
+                Clients.Client(gameToQuit.Player1.Id).clientShowLobby();
+                Clients.Client(gameToQuit.Player2.Id).clientShowLobby();
+            }
         }
 
         public void ExitGame(string gameStringId,string playerWhoQuitsId)
@@ -140,10 +152,13 @@ namespace TicTacToeSignalR.Core.Mechanics
             if (gameId != Guid.Empty)
             {
                 Game gameToQuit = GameManager.QuitGame(gameId, playerWhoQuitsId);
-                string playerToJoinLobby = gameToQuit.Player1.Id == playerWhoQuitsId ? gameToQuit.Player2.Id : gameToQuit.Player1.Id;
+                if (gameToQuit != null)
+                {
+                    string playerToJoinLobby = gameToQuit.Player1.Id == playerWhoQuitsId ? gameToQuit.Player2.Id : gameToQuit.Player1.Id;
 
-                Clients.Client(playerWhoQuitsId).exitGame();
-                Clients.Client(playerToJoinLobby).clientShowLobby();
+                    Clients.Client(playerWhoQuitsId).exitGame();
+                    Clients.Client(playerToJoinLobby).clientShowLobby();
+                }
             }
             else
             {
@@ -164,6 +179,32 @@ namespace TicTacToeSignalR.Core.Mechanics
             if (e != null)
             {
                 Clients.Client(e.ClientId).movePiece(e.Message, e.Value);
+            }
+        }
+        public void OnErrorOccured(object sender, NotificationEventArgs<string> e)
+        {
+            if (e != null)
+            {
+                if (e.ClientId != string.Empty)
+                {
+                    Clients.Client(e.ClientId).notify(new UserNotification(e.Message, UserNotificationType.Red));
+                }
+                else
+                {
+                    Clients.Client(this.Context.ConnectionId).notify(new UserNotification(e.Message, UserNotificationType.Red));
+                }
+            }
+        }
+        public void OnUpdateSummary(object sender, NotificationEventArgs<Game> e)
+        {
+            if (e != null)
+            {
+                //TODO : check if we have a winner and udate to win screen
+
+                List<string> result = e.Value.Moves.Values.Select(move => move.ToString()).ToList();
+
+                Clients.Client(e.Value.Player1.Id).refreshSummary(result);
+                Clients.Client(e.Value.Player2.Id).refreshSummary(result);
             }
         }
         #endregion Handle Events

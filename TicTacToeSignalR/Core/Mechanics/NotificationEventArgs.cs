@@ -27,7 +27,13 @@ namespace TicTacToeSignalR
             get { return _value; }
             set { _value = value; }
         }
-        
+
+        public NotificationEventArgs(T value) : this(string.Empty,string.Empty,value)
+        {
+        }
+        public NotificationEventArgs(string clientId,string message) : this(clientId,message,null)
+        {
+        }
         public NotificationEventArgs(): this(string.Empty,string.Empty, default(T))
         {
         }
@@ -39,8 +45,8 @@ namespace TicTacToeSignalR
         }
 
 
-        private static NotificationEventArgs<Movement> _nullNotificationEventArgs = new NotificationEventArgs<Movement>();
-        public static NotificationEventArgs<Movement> Null
+        private static NotificationEventArgs<T> _nullNotificationEventArgs = new NotificationEventArgs<T>();
+        public static NotificationEventArgs<T> Null
         {
             get
             {

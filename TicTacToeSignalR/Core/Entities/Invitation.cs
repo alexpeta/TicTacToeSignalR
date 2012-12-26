@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web;
+using TicTacToeSignalR.Core;
 
 namespace TicTacToeSignalR
 {
@@ -39,6 +40,18 @@ namespace TicTacToeSignalR
             }
         }
         #endregion
+        #region Events
+        public EventHandler<NotificationEventArgs<string>> ErrorOccurred;
+        private void RaiseErrorOccurred(NotificationEventArgs<string> e)
+        {
+            var handler = this.ErrorOccurred;
+            if (handler != null)
+            {
+                handler(this, e);
+            }
+        }
+        #endregion Events
+
 
         public bool Equals(Invitation other)
         {
@@ -99,7 +112,6 @@ namespace TicTacToeSignalR
             return (this.SentDate - olderInvitation.SentDate) > TimeSpan.FromMinutes(MinutesToExpire);
         }
 
-
         public Game CreateGameFromInvite()
         {
             if (this.From != null && this.To != null)
@@ -116,23 +128,38 @@ namespace TicTacToeSignalR
         {
             StringBuilder sb = new StringBuilder();
 
-            sb.Append(string.Format(@"<div id=""{0}"" class=""invite"" style=""width:400px;"">",this.InviteId));
-            sb.Append(string.Format(@"<div style=""width:300px;float:left""><span id=""inviter"">{0}</span> invited you to play a match.</div>", this.From.Nick));
-            sb.Append(@"<div style=""width:70px;float:right"">");
-            sb.Append(@"     <div style=""width:35px;float:left"">");
-            sb.Append(string.Format(@"         <a href=""javascript:$.connection.gameHub.client.sendAnswer('{0}',true)"" class=""invite-answer"">Yes</a>",this.InviteId));
-            sb.Append("     </div>");;
-            sb.Append(@"     <div style=""width:35px;float:left"">");
-            sb.Append(string.Format(@"         <a href=""javascript:$.connection.gameHub.client.sendAnswer('{0}',false)"" class=""invite-answer"">No</a>",this.InviteId));
-            sb.Append(@"     </div>");
-            sb.Append(@"     <div style=""clear:left;""></div>");
-            sb.Append(@" </div>");
-            sb.Append(@" <div style=""clear:both;""></div>");
-//            sb.Append(string.Format(@"<script type=""text/javascript"">
-//                                       var t = setTimeout(""$('#{0}').remove();"",{1});                                     
-//                                    </script>", this.InviteId,this.MinutesToExpire*60*1000));
-            sb.Append(@"</div>");
-
+            try
+            {
+                sb.Append(string.Format(@"<div id=""{0}"" class=""invite"" style=""width:400px;"">", this.InviteId));
+                sb.Append(string.Format(@"<div style=""width:300px;float:left""><span id=""inviter"">{0}</span> invited you to play a match.</div>", this.From.Nick));
+                sb.Append(@"<div style=""width:70px;float:right"">");
+                sb.Append(@"     <div style=""width:35px;float:left"">");
+                sb.Append(string.Format(@"         <a href=""javascript:$.connection.gameHub.client.sendAnswer('{0}',true)"" class=""invite-answer"">Yes</a>", this.InviteId));
+                sb.Append("     </div>"); ;
+                sb.Append(@"     <div style=""width:35px;float:left"">");
+                sb.Append(string.Format(@"         <a href=""javascript:$.connection.gameHub.client.sendAnswer('{0}',false)"" class=""invite-answer"">No</a>", this.InviteId));
+                sb.Append(@"     </div>");
+                sb.Append(@"     <div style=""clear:left;""></div>");
+                sb.Append(@" </div>");
+                sb.Append(@" <div style=""clear:both;""></div>");
+                //            sb.Append(string.Format(@"<script type=""text/javascript"">
+                //                                       var t = setTimeout(""$('#{0}').remove();"",{1});                                     
+                //                                    </script>", this.InviteId,this.MinutesToExpire*60*1000));
+                sb.Append(@"</div>");
+            }
+            catch
+            {
+                if (this.From != null)
+                {
+                    RaiseErrorOccurred(new NotificationEventArgs<string>(From.Id, "Error when creating invite markup!"));
+                }
+                else
+                {
+                    RaiseErrorOccurred(new NotificationEventArgs<string>(string.Empty, "Error when creating invite markup!"));
+                }
+                return string.Empty;
+            }
+            
             return sb.ToString();
         }
     }

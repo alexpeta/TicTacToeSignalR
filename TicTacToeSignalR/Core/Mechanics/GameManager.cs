@@ -109,19 +109,19 @@ namespace TicTacToeSignalR.Core.Mechanics
         public static Game GetGameByPlayerId(string playerId)
         {
             Game result = _games.Where(g=> 
-                            { 
-                                if( g.Value != null &&
-                                    ((g.Value.Player1!= null && g.Value.Player1.Id == playerId) || 
-                                    (g.Value.Player2!= null && g.Value.Player2.Id == playerId))
-                                  )
-                                {
-                                    return true;
-                                }
-                                else
-                                {
-                                    return false;
-                                }
-                            }).Select(g=>g.Value).FirstOrDefault();
+            { 
+                if( g.Value != null &&
+                    ((g.Value.Player1!= null && g.Value.Player1.Id == playerId) || 
+                    (g.Value.Player2!= null && g.Value.Player2.Id == playerId))
+                    )
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }).Select(g=>g.Value).FirstOrDefault();
 
             return result;
         }
@@ -142,14 +142,11 @@ namespace TicTacToeSignalR.Core.Mechanics
             {
                 game.Winner = game.Player1.Id == playerWhoQuitsId ? game.Player2 : game.Player1;
                 //TODO: transfer Game entity to a persistent state.
-               _games.TryRemove(game.GameId, out game);
+                _games.TryRemove(game.GameId, out game);
             } 
             return game;
         }
         #endregion
-
-
-
 
     }
 }

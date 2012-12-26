@@ -15,6 +15,9 @@
         <div id="body">
             @RenderSection("featured", required: false)
             <section class="content-wrapper main-content clear-fix">
+                <div id="notification-panel" class="green">
+                    <a id="notifcation-message" href="javascript:void(0);"></a>   
+                </div>
                 @RenderBody()
             </section>
         </div>

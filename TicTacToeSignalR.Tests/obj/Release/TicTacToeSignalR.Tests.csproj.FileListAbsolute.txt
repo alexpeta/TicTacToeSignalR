@@ -42,3 +42,5 @@ C:\Users\Alex\Documents\Visual Studio 2012\Projects\TicTacToeSignalR\TicTacToeSi
 C:\Users\Alex\Documents\Visual Studio 2012\Projects\TicTacToeSignalR\TicTacToeSignalR.Tests\obj\Release\TicTacToeSignalR.Tests.csprojResolveAssemblyReference.cache
 C:\Users\Alex\Documents\Visual Studio 2012\Projects\TicTacToeSignalR\TicTacToeSignalR.Tests\obj\Release\TicTacToeSignalR.Tests.dll
 C:\Users\Alex\Documents\Visual Studio 2012\Projects\TicTacToeSignalR\TicTacToeSignalR.Tests\obj\Release\TicTacToeSignalR.Tests.pdb
+C:\Users\Alex\Documents\Visual Studio 2012\Projects\TicTacToeSignalR\TicTacToeSignalR.Tests\bin\Release\TicTacToeSignalR.Tests.dll.CodeAnalysisLog.xml
+C:\Users\Alex\Documents\Visual Studio 2012\Projects\TicTacToeSignalR\TicTacToeSignalR.Tests\bin\Release\TicTacToeSignalR.Tests.dll.lastcodeanalysissucceeded

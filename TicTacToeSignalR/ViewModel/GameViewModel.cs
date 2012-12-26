@@ -6,23 +6,8 @@ using TicTacToeSignalR.Core.Mechanics;
 
 namespace TicTacToeSignalR.ViewModel
 {
-    public class GameViewModel : Game
+    public class GameViewModel
     {
-        private List<Player> _allPlayers = new List<Player>();
-
-        public List<Player> AllPlayers
-        {
-            get 
-            {
-                return _allPlayers;
-            }
-            set { _allPlayers = value; }
-        }
-
-        public GameViewModel() : base(null,null)
-        {
-                
-        }
         
     }
 }

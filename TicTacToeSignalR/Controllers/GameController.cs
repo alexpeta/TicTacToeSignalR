@@ -9,7 +9,6 @@ using TicTacToeSignalR.Models;
 using TicTacToeSignalR.Utility;
 using TicTacToeSignalR.ViewModel;
 
-
 namespace TicTacToeSignalR.Controllers
 {
     public class GameController : Controller
@@ -29,9 +28,30 @@ namespace TicTacToeSignalR.Controllers
                 ProfileViewModel newProfile = new ProfileViewModel();
                 newProfile.Nick = NicknamesHelper.GetRandomNick();
                 newProfile.Avatar = AvatarsHelper.GetRandomAvatar();
-                CookieManager.WriteCoockie(this.HttpContext, CookieManager.UserCookieName, newProfile.Nick);
-                CookieManager.WriteCoockie(this.HttpContext, CookieManager.AvatarCookieName, newProfile.Avatar);
+                CookieManager.WriteCookie(this.HttpContext, CookieManager.UserCookieName, newProfile.Nick);
+                CookieManager.WriteCookie(this.HttpContext, CookieManager.AvatarCookieName, newProfile.Avatar);
                 return View(newProfile);
+                //if (this.HttpContext.HasCookie(CookieManager.UserCookieName))
+                //{
+                //    ProfileViewModel vm = new ProfileViewModel();
+                //    vm.Nick = this.HttpContext.GetCookieValue(CookieManager.UserCookieName);
+
+                //    if (this.HttpContext.HasCookie(CookieManager.AvatarCookieName))
+                //    {   
+                //        vm.Avatar = this.HttpContext.GetCookieValue(CookieManager.AvatarCookieName);
+                //        return View(vm);
+                //    }
+                //    else
+                //    {
+                //        vm.Avatar = AvatarsHelper.GetRandomAvatar();
+                //        return View(vm);
+                //    }
+                //}
+                //else
+                //{
+                //    //redirect to index page
+                //    return RedirectToAction("Index", "Home", null); 
+                //}
             }
             return View(profile);
         }

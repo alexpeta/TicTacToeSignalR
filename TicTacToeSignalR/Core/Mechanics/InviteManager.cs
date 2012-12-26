@@ -104,14 +104,14 @@ namespace TicTacToeSignalR
         {
             if (player == null) return false;
 
-            return _invitations.Where(inv => inv.From.Equals(player)).Any();
+            return _invitations.Any(inv => inv.From.Equals(player));
         }
 
         private static bool HasPendingAnswers(Player player)
         {
             if (player == null) return false;
 
-            return _invitations.Where(inv => inv.To.Equals(player)).Any();
+            return _invitations.Any(inv => inv.To.Equals(player));
         }
         #endregion
 

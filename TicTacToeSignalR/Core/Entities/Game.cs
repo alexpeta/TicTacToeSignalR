@@ -5,6 +5,9 @@ using System.Web;
 
 namespace TicTacToeSignalR
 {
+    /// <summary>
+    /// Game entity that holds the game context : players, moves, board.
+    /// </summary>
     public class Game
     {
         public const int Dimension = 3;
@@ -15,7 +18,7 @@ namespace TicTacToeSignalR
         private Player _player2;
         private Player _winner;
         private char[,] _board;
-        private List<Movement> _moves;
+        private SortedList<int, Movement> _moves;
         #endregion
 
         public Guid GameId
@@ -43,13 +46,16 @@ namespace TicTacToeSignalR
             get { return _board; }
             set { _board = value; }
         }
-        //public List<Movement> Moves
-        //{
-        //    get { return _moves; }
-        //    set { _moves = value; }
-        //}
+        public SortedList<int, Movement> Moves
+        {
+            get { return _moves; }
+        }
 
         public event EventHandler<NotificationEventArgs<Movement>> PlayerHasMovedPiece;
+        public event EventHandler<NotificationEventArgs<string>> ErrorOccurred;
+        public event EventHandler<NotificationEventArgs<Game>> UpdateSummary;
+       
+        #region Fire
         private void RaisePlayerHasMoved(NotificationEventArgs<Movement> e)
         {
             var handler = PlayerHasMovedPiece;
@@ -58,18 +64,34 @@ namespace TicTacToeSignalR
                 PlayerHasMovedPiece(this,e);
             }
         }
-
+        private void RaiseErrorOccurred(NotificationEventArgs<string> e)
+        {
+            var handler = this.ErrorOccurred;
+            if (handler != null)
+            {
+                handler(this, e);
+            }
+        }
+        private void RaiseUpdateSummary(NotificationEventArgs<Game> e)
+        {
+            var handler = this.UpdateSummary;
+            if (handler != null)
+            {
+                handler(this, e);
+            }
+        }
+        #endregion Fire
 
         #region Constructors
         public Game()
-            : this(Guid.Empty, new char[Game.Dimension, Game.Dimension], Player.Null, Player.Null, new List<Movement>())
+            : this(Guid.Empty, new char[Game.Dimension, Game.Dimension], Player.Null, Player.Null, new SortedList<int,Movement>())
         {
         }
         public Game(Player p1, Player p2)
-            : this(Guid.NewGuid(), new char[Game.Dimension, Game.Dimension], p1, p2, new List<Movement>())
+            : this(Guid.NewGuid(), new char[Game.Dimension, Game.Dimension], p1, p2, new SortedList<int,Movement>())
         {
         }
-        public Game (Guid gameId,char[,] board,Player p1, Player p2, List<Movement> moves)
+        public Game (Guid gameId,char[,] board,Player p1, Player p2, SortedList<int,Movement> moves)
 	    {
             GameId = gameId;
             Board = board;
@@ -106,18 +128,80 @@ namespace TicTacToeSignalR
 
             if (!isValidMove(move, playerId))
             {
-                RaisePlayerHasMoved(new NotificationEventArgs<Movement>(replyTo.Id, "Invalid move", move));
+                NotificationEventArgs<string> args = new NotificationEventArgs<string>();
+                args.Message = "Impossible. Invalid move!";
+                RaiseErrorOccurred(args);
                 return false;
             }
             else
             {
-                RaisePlayerHasMoved(new NotificationEventArgs<Movement>(replyTo.Id, from.Nick+move.ToString(), move));
+                move.Player = from;
+                Board[move.X, move.Y] = move.Piece;
+                _moves.Add(_moves.Count, move);
+
+                RaisePlayerHasMoved(new NotificationEventArgs<Movement>(replyTo.Id, from.Nick  +move.ToString(), move));
+                RaiseUpdateSummary(new NotificationEventArgs<Game>(this));
                 return true;
             }
         }
+        
+        private bool IsWon()
+        {
+            char x = 'x';
+            char o = 'o';
+            //its turn-based so you can get a 3rd piece to win the earliest at the 5th turn
+            if (_moves.Count<=4)
+            {
+                return false;
+            }
 
+            //rows
+            for (int i = 0; i < Game.Dimension; i++)
+            {
+                if (Board[i,0] == x && Board[i,1] == x && Board[i,2] == x)
+                {
+
+                }
+                if (Board[i, 0] == o && Board[i, 1] == o && Board[i, 2] == o)
+                {
+
+                }
+            }
+
+            //columns
+            for (int j = 0; j < Game.Dimension; j++)
+            {
+                if(Board[0,j] == x && Board[1, j] == x && Board[2, j] == x)
+                {
+
+                }
+
+                if (Board[0, j] == o && Board[1, j] == o && Board[2, j] == o)
+                {
+
+                }
+            }
+
+            //diagonals
+            return false;
+        }
         private bool isValidMove(Movement move, string playerId)
         {
+            //if (_moves.Count == 0)
+            //{
+            //    return true;
+            //}
+            //else
+            //{
+            //    if (_moves[_moves.Count - 1].Piece == move.Piece)
+            //    {
+            //        return false;
+            //    }
+            //    else
+            //    {
+            //        return true;
+            //    }
+            //}
             return true;
         }
 

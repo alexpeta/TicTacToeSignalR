@@ -13,7 +13,7 @@ namespace TicTacToeSignalR.Utility
 
         public static string CookieValue = string.Empty;
 
-        public static bool CheckCookie(HttpContextBase context,string cookieName)
+        public static bool HasCookie(HttpContextBase context,string cookieName)
         {
             if (context == null) return false;
 
@@ -39,13 +39,13 @@ namespace TicTacToeSignalR.Utility
             }
         }
 
-        public static void WriteCoockie(HttpContextBase context,string cookieName, string value)
+        public static void WriteCookie(HttpContextBase context,string cookieName, string value)
         {
             if (context == null) return;
 
             if (context.Response == null) return;
 
-            if (CheckCookie(context,cookieName))
+            if (context.HasCookie(cookieName))
             {
                 context.Response.Cookies.Remove(cookieName);
             }
@@ -57,5 +57,6 @@ namespace TicTacToeSignalR.Utility
 
             context.Response.Cookies.Add(cookie);
         }
+
     }
 }

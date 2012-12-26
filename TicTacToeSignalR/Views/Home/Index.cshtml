@@ -1,17 +1,23 @@
 ﻿@model TicTacToeSignalR.ViewModel.ProfileViewModel
 @{
-    ViewBag.Title = "Welcome";
+    ViewBag.Title = "Welcome to yet another TicTacToe game.";
 }
 
-<script type="text/javascript">
-    function selectAvatar(name) {
-        if (name != null) {
-            $('#avatars a').removeClass('selected');
-            $('#avatars a[data-id="' + name + '"]').addClass('selected');
-            $('#Avatar').val(name);
-        }
-    }
-</script>
+<div>
+    <table>
+        <tr>
+            <td>
+                <div></div>
+            </td>
+            <td>
+                <div></div>
+            </td>
+        </tr>
+    </table>
+</div>
+
+
+
 
 <div class="box" style="margin-left:auto;margin-right:auto;">
     <h1>Create Player Profile</h1>
@@ -51,3 +57,12 @@
         </div>
     </div>
 </div>
+<script type="text/javascript">
+    function selectAvatar(name) {
+        if (name != null) {
+            $('#avatars a').removeClass('selected');
+            $('#avatars a[data-id="' + name + '"]').addClass('selected');
+            $('#Avatar').val(name);
+        }
+    }
+</script>

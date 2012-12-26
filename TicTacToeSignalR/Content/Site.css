@@ -847,7 +847,10 @@ tr.pager td {
     }
     #avatars li a.selected,
     #players-container li a.selected {
-        background-color:#0094ff;
+        background-color:#ff6a00;
+    }
+    #players-container li a.selected:hover{
+        background-color:#ff6a00;
     }
 
     #players-container li a:hover {
@@ -973,3 +976,39 @@ tr.pager td {
 .IDR_PROFILE_AVATAR_25 {
     background-image: url("/Content/avatars/IDR_PROFILE_AVATAR_25.png");
 }
+
+/** NOTIFICATIONS **/
+#notification-panel {
+    background-color: #525252;
+    box-shadow: 0 0 1px #FFFFCC inset;
+    color: #FFFFFF;
+    cursor: pointer;
+    display: block;
+    font-family: 'Segoe UI Semilight','Open Sans',Verdana,Arial,Helvetica,sans-serif;
+    font-weight: 300;
+    margin-left:auto;
+    margin-right:auto;
+    overflow: hidden;
+    position: relative;
+    text-decoration: none;
+    width: 450px;
+    padding:2px 4px;
+    text-align:center;
+}
+    #notification-panel a {
+        text-decoration : none;
+        color:white;
+    }
+        #notification-panel a:hover {
+            background:inherit;
+        }
+    #notification-panel.blue {
+        background-color: #2D89EF !important;
+    }
+    #notification-panel.red {
+        background-color: #B91D47 !important;
+    }
+    #notification-panel.green {
+        background-color: #00A300 !important;
+    }
+
