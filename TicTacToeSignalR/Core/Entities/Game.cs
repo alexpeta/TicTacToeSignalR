@@ -54,6 +54,7 @@ namespace TicTacToeSignalR
         public event EventHandler<NotificationEventArgs<Movement>> PlayerHasMovedPiece;
         public event EventHandler<NotificationEventArgs<string>> ErrorOccurred;
         public event EventHandler<NotificationEventArgs<Game>> UpdateSummary;
+        public event EventHandler<NotificationEventArgs<Game>> WonGame;
        
         #region Fire
         private void RaisePlayerHasMoved(NotificationEventArgs<Movement> e)
@@ -75,6 +76,14 @@ namespace TicTacToeSignalR
         private void RaiseUpdateSummary(NotificationEventArgs<Game> e)
         {
             var handler = this.UpdateSummary;
+            if (handler != null)
+            {
+                handler(this, e);
+            }
+        }
+        private void RaiseWonGame(NotificationEventArgs<Game> e)
+        {
+            var handler = this.WonGame;
             if (handler != null)
             {
                 handler(this, e);
@@ -113,35 +122,57 @@ namespace TicTacToeSignalR
 
         public bool AddMove(Movement move,string playerId)
         {
-            Player replyTo = null;
-            Player from = null;
-            if (this.Player1.Id != playerId)
+            if (move == null)
             {
-                replyTo = this.Player1;
-                from = this.Player2;
-            }
-            else
-            {
-                replyTo = this.Player2;
-                from = this.Player1;
-            }
-
-            if (!isValidMove(move, playerId))
-            {
-                NotificationEventArgs<string> args = new NotificationEventArgs<string>();
-                args.Message = "Impossible. Invalid move!";
-                RaiseErrorOccurred(args);
                 return false;
             }
-            else
-            {
-                move.Player = from;
-                Board[move.X, move.Y] = move.Piece;
-                _moves.Add(_moves.Count, move);
 
-                RaisePlayerHasMoved(new NotificationEventArgs<Movement>(replyTo.Id, from.Nick  +move.ToString(), move));
-                RaiseUpdateSummary(new NotificationEventArgs<Game>(this));
-                return true;
+            //if (this.Moves.Count > 4 && this.Winner != null && this.Winner != Player.Null)
+            {
+                Player replyTo = null;
+                Player from = null;
+                if (this.Player1.Id != playerId)
+                {
+                    replyTo = this.Player1;
+                    from = this.Player2;
+                }
+                else
+                {
+                    replyTo = this.Player2;
+                    from = this.Player1;
+                }
+
+                if (!isValidMove(move, playerId))
+                {
+                    NotificationEventArgs<string> args = new NotificationEventArgs<string>();
+                    args.Message = "Impossible. Invalid move!";
+                    RaiseErrorOccurred(args);
+                    return false;
+                }
+                else
+                {
+                    move.Player = from;
+                    Board[move.X, move.Y] = move.Piece;
+                    Moves.Add(Moves.Count, move);
+
+                    if (this.IsWon())
+                    {
+                        this.Winner = from;
+                        RaisePlayerHasMoved(new NotificationEventArgs<Movement>(replyTo.Id, from.Nick + move.ToString(), move));
+                        RaiseWonGame(new NotificationEventArgs<Game>(this));
+                        return true;
+                    }
+                    else
+                    {
+                        RaisePlayerHasMoved(new NotificationEventArgs<Movement>(replyTo.Id, from.Nick + move.ToString(), move));
+                        RaiseUpdateSummary(new NotificationEventArgs<Game>(this));
+                        return true;
+                    }
+                }
+            }
+            //else
+            {
+            //    return false;
             }
         }
         
@@ -150,7 +181,7 @@ namespace TicTacToeSignalR
             char x = 'x';
             char o = 'o';
             //its turn-based so you can get a 3rd piece to win the earliest at the 5th turn
-            if (_moves.Count<=4)
+            if (Moves.Count<=4)
             {
                 return false;
             }
@@ -158,48 +189,110 @@ namespace TicTacToeSignalR
             //rows
             for (int i = 0; i < Game.Dimension; i++)
             {
-                if (Board[i,0] == x && Board[i,1] == x && Board[i,2] == x)
+                if ((Board[i,0] == x && Board[i,1] == x && Board[i,2] == x) || (Board[i, 0] == o && Board[i, 1] == o && Board[i, 2] == o))
                 {
-
-                }
-                if (Board[i, 0] == o && Board[i, 1] == o && Board[i, 2] == o)
-                {
-
+                    Moves.Values.ToList().ForEach(m =>
+                    {
+                        if (m.X == i && (m.Y == 0 || m.Y == 1 || m.Y == 2))
+                        {
+                            m.IsWinningMove = true;
+                        }
+                        else
+                        {
+                            m.IsWinningMove = false;
+                        }
+                    });
+                    return true;
                 }
             }
 
             //columns
             for (int j = 0; j < Game.Dimension; j++)
             {
-                if(Board[0,j] == x && Board[1, j] == x && Board[2, j] == x)
+
+                if ((Board[0, j] == x && Board[1, j] == x && Board[2, j] == x) || (Board[0, j] == o && Board[1, j] == o && Board[2, j] == o))
                 {
-
-                }
-
-                if (Board[0, j] == o && Board[1, j] == o && Board[2, j] == o)
-                {
-
+                    Moves.Values.ToList().ForEach(m =>
+                    {
+                        if (m.Y == j && (m.X == 0 || m.X == 1 || m.X == 2))
+                        {
+                            m.IsWinningMove = true;
+                        }
+                        else
+                        {
+                            m.IsWinningMove = false;
+                        }
+                    });
+                    return true;
                 }
             }
 
             //diagonals
+            //principal
+            for (int k = 0; k < Game.Dimension; k++)
+            {
+                if ((Board[k, k] == x && Board[k,k] == x && Board[k, k] == x) || (Board[k,k] == o && Board[k, k] == o && Board[k, k] == o))
+                {
+                    Moves.Values.ToList().ForEach(m =>
+                    {
+                        if (m.Y == m.X)
+                        {
+                            m.IsWinningMove = true;
+                        }
+                        else
+                        {
+                            m.IsWinningMove = false;
+                        }
+                    });
+                    return true;
+                }
+            }
+
+            //secondaire
+            for (int k = 0; k < Game.Dimension; k++)
+            {
+                if ((Board[k, Game.Dimension - k - 1] == x && Board[k, Game.Dimension - k - 1] == x && Board[k, Game.Dimension - k - 1] == x) || (Board[k, Game.Dimension - k - 1] == o && Board[k, Game.Dimension - k - 1] == o && Board[k, Game.Dimension - k - 1] == o))
+                {
+                    Moves.Values.ToList().ForEach(m =>
+                    {
+                        if (m.Y == m.X)
+                        {
+                            m.IsWinningMove = true;
+                        }
+                        else
+                        {
+                            m.IsWinningMove = false;
+                        }
+                    });
+                    return true;
+                }
+            }
+
             return false;
         }
         private bool isValidMove(Movement move, string playerId)
         {
-            //if (_moves.Count == 0)
+            //if (Moves.Count == 0)
             //{
             //    return true;
             //}
             //else
             //{
-            //    if (_moves[_moves.Count - 1].Piece == move.Piece)
+            //    Movement lastMove = Moves.Values.LastOrDefault();
+            //    if (lastMove == null)
             //    {
-            //        return false;
+            //        return true;
             //    }
             //    else
             //    {
-            //        return true;
+            //        if (lastMove.Piece == move.Piece)
+            //        {
+            //            return false;
+            //        }
+            //        else
+            //        {
+            //            return true;
+            //        }
             //    }
             //}
             return true;

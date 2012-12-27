@@ -11,6 +11,9 @@ namespace TicTacToeSignalR
         private int _x;
         private int _y;
         private char _piece;
+        private bool _isWinningMove;
+
+
 
         public int X
         {
@@ -32,16 +35,22 @@ namespace TicTacToeSignalR
             get { return _player; }
             set { _player = value; }
         }
+        public bool IsWinningMove
+        {
+            get { return _isWinningMove; }
+            set { _isWinningMove = value; }
+        }
 
-        public Movement() : this(0,0,char.MinValue,null)
+        public Movement() : this(0,0,char.MinValue,null,false)
         {
         }
-        public Movement(int x, int y, char piece,Player player)
+        public Movement(int x, int y, char piece,Player player,bool isWinningMove)
         {
             X = x;
             Y = y;
             Piece = piece;
             Player = player;
+            IsWinningMove = isWinningMove;
         }
 
         #region Overrides

@@ -40,7 +40,10 @@
     }
     
     table.board a.selectedo,
-    table.board a.selectedx {
+    table.board a.selectedx,
+    table.board a.wono,
+    table.board a.wonx
+     {
          cursor:not-allowed;
     }
     
@@ -51,14 +54,29 @@
        background-repeat : no-repeat;
        background-color:#E48600;
     }
-    
-    
+        
     table.board a.selectedx,
      table.board a.x:hover {
        background-image:url("../../Content/themes/base/images/x.png");
        background-position:center center;
        background-repeat : no-repeat;
        background-color:#91AB31;
+    }
+
+    table.board a.wono,
+    table.board a.wono:hover {
+       background-image:url("../../Content/themes/base/images/o.png");
+       background-position:center center;
+       background-repeat : no-repeat;
+       background-color:red;
+    }
+    
+    table.board a.wonx,
+    table.board a.wonx:hover {
+       background-image:url("../../Content/themes/base/images/x.png");
+       background-position:center center;
+       background-repeat : no-repeat;
+       background-color:red;
     }
 
     #lobby {
@@ -169,6 +187,35 @@
 
 
 <script type="text/javascript">
+
+    var gameContextNamespace = {
+        IsGameOver : false,
+        LastMove : '',
+        MovesList: [],
+        Movement : function (x, y, piece) {
+            if (x && typeof (x) === 'number') {
+                this.X = x;
+            }
+            else {
+                throw new Error("Parameter <x> must be a number greather then 0.");
+            }
+            if (y && typeof (y) === 'number') {
+                this.Y = y;
+            }
+            else {
+                throw new Error("Parameter <y> must be a number greather then 0.");
+            }
+            if (piece && typeof (piece) === 'string' && piece.length === 1) {
+                this.Piece = piece;
+            }
+            else {
+                throw new Error("Parameter <piece> must be a not null char.");
+            }
+        }
+    };
+
+
+
     $(function () {
         //signalR
         var proxy = $.connection.gameHub;
@@ -178,35 +225,66 @@
         proxy.client.test = function (data) {
             alert(data);
         }
-        
+
+        proxy.client.gameOver = function (game) {
+            if (game != null) {
+
+                //change board pieces
+                if (game.Moves != null) {
+                    $.each(game.Moves, function (index, move) {
+                        if (move.IsWinningMove == true) {
+                            $('.board td a[data-x="' + move.X + '"][data-y="' + move.Y + '"]').removeClass().addClass('won' + move.Piece);
+                        }
+                    });
+                }
+                //notify players
+                if (game.Winner != null) {
+                    if (game.Winner.Id == $.connection.gameHub.connection.id) {
+                        proxy.clie.notify({ Message: 'YOU WIN!!!!!!', Type: 'blue' });
+                    }
+                    else {
+                        proxy.clie.notify({ Message: 'YOU LOSE!', Type: 'red' });
+                    }
+                }
+                gameContextNamespace.IsGameOver = true;
+
+            }
+        }
+
         proxy.client.notify = function (n) {
             $('#notification-panel').removeClass().addClass(n.Type);
             $('#notifcation-message').html(n.Message);
             $('#notification-panel').fadeIn(300);
         }
 
+        proxy.client.callMovePiece = function (px, py, paramPiece, cellId) {
 
-        proxy.client.callMovePiece = function (px,py,paramPiece,cellId) {
-            //making selection for current player
-            var selectedCell = $('#' + cellId);
-            selectedCell.removeAttr('href');
-            selectedCell.removeClass(paramPiece).addClass('selected' + paramPiece);
+            if (!gameContextNamespace.IsGameOver && ((gameContextNamespace.LastMove == '' && paramPiece == 'x') || (gameContextNamespace.LastMove != '' && gameContextNamespace.LastMove != paramPiece))) {
+                //making selection for current player
+                var selectedCell = $('#' + cellId);
+                selectedCell.removeAttr('href');
+                selectedCell.removeClass(paramPiece).addClass('selected' + paramPiece);
 
-            var notification = {
-                Message: 'Wait for the other player to move!',
-                Type: 'red'
-            };
-            proxy.client.notify(notification);
+                var notification = {
+                    Message: 'Wait for the other player to move!',
+                    Type: 'red'
+                };
+                proxy.client.notify(notification);
 
-            //preparing what to send to the server
-            var move = {
-                x: px,
-                y: py,
-                piece: paramPiece
-            };
-            var gameId = $('.board').attr('data-id');
-            var playerId = $.connection.gameHub.connection.id;
-            proxy.server.serverCallMovePiece(gameId, move, playerId);
+                //preparing what to send to the server
+                var move = {
+                    x: px,
+                    y: py,
+                    piece: paramPiece
+                };
+                var gameId = $('.board').attr('data-id');
+                var playerId = $.connection.gameHub.connection.id;
+                proxy.server.serverCallMovePiece(gameId, move, playerId);
+                gameContextNamespace.LastMove = paramPiece;
+            }
+            else {
+                proxy.client.notify({Message : 'Impossible. Invalid move',Type:'red'});
+            }
         }
 
         proxy.client.movePiece = function (message, movement) {
@@ -223,6 +301,7 @@
 
                         selectedCell.removeAttr('href');
                         selectedCell.removeClass().addClass('selected' + movement.Piece);
+                        gameContextNamespace.LastMove = movement.Piece;
                     }
                 });
             }
@@ -249,8 +328,7 @@
         proxy.client.exitGame = function () {
             window.location.href = "/";
         }
-
-
+        
         proxy.client.clientQuitToLobby = function() {
             var gameId = $('.board').attr('data-id');
             proxy.server.quitToLobby(gameId, $.connection.gameHub.connection.id)
@@ -290,13 +368,20 @@
 
             if (game != null) {
                 if (game.Player1 != null) {
-                    $('#game-session-players').append('<li class="player1 '+game.Player1.Avatar+'">' + game.Player1.Nick + '</li>');
+                    $('#game-session-players').append('<li class="player1 ' + game.Player1.Avatar + '">' + game.Player1.Nick + '</li>');
                 }
+
                 if (game.Player2 != null) {
                     $('#game-session-players').append('<li class="player2 ' + game.Player2.Avatar + '">' + game.Player2.Nick + '</li>');
                 }
-            }
 
+                if (game.Player1.Id == $.connection.gameHub.connection.id) {
+                    proxy.client.notify({ Message: 'Your move!', Type: 'green' });
+                }
+                else {
+                    proxy.client.notify({ Message: 'Wait for the other player to move', Type: 'red' });
+                }
+            }
             $('#game-session').css('display', 'block');
         }
 
@@ -377,7 +462,7 @@
                 });
         })
         .fail(function () {
-            console.log('failed to load signalr');
+            alert('failed to load signalr');
         });
     });
 </script>

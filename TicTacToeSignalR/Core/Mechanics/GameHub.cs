@@ -65,6 +65,7 @@ namespace TicTacToeSignalR.Core.Mechanics
                     game.PlayerHasMovedPiece += OnPlayerHasMovedPiece;
                     game.ErrorOccurred += OnErrorOccured;
                     game.UpdateSummary += OnUpdateSummary;
+                    game.WonGame += OnWonGame;
 
                     if (game != null)
                     {
@@ -173,6 +174,12 @@ namespace TicTacToeSignalR.Core.Mechanics
             }
         }
 
+        public string Testing()
+        {
+            return "testing 123";
+        }
+
+
         #region Handle Events
         public void OnPlayerHasMovedPiece(object sender, NotificationEventArgs<Movement> e)
         {
@@ -199,12 +206,19 @@ namespace TicTacToeSignalR.Core.Mechanics
         {
             if (e != null)
             {
-                //TODO : check if we have a winner and udate to win screen
-
                 List<string> result = e.Value.Moves.Values.Select(move => move.ToString()).ToList();
 
                 Clients.Client(e.Value.Player1.Id).refreshSummary(result);
                 Clients.Client(e.Value.Player2.Id).refreshSummary(result);
+            }
+        }
+        public void OnWonGame(object sender, NotificationEventArgs<Game> e)
+        {
+            if (e != null)
+            {
+                 //Clients.All.test("GAME OVER");
+                 Clients.Client(e.Value.Player1.Id).gameOver(e.Value);
+                 Clients.Client(e.Value.Player2.Id).gameOver(e.Value);
             }
         }
         #endregion Handle Events
@@ -212,9 +226,9 @@ namespace TicTacToeSignalR.Core.Mechanics
         #region Overrides
         public override Task OnDisconnected()
         {
-            string playerWhoExitsId = this.Context.ConnectionId;
             try
             {
+                string playerWhoExitsId = this.Context.ConnectionId;
                 Player toRemove = null;
                 bool hasBeenRemoved = _lobby.TryRemove(playerWhoExitsId, out toRemove);
                 if (!hasBeenRemoved)
