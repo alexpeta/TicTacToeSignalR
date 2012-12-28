@@ -229,43 +229,37 @@ namespace TicTacToeSignalR
 
             //diagonals
             //principal
-            for (int k = 0; k < Game.Dimension; k++)
+            if ((Board[0,0] == x && Board[1,1] == x && Board[2, 2] == x) || (Board[0, 0] == o && Board[1,1] == o && Board[2,2] == o))
             {
-                if ((Board[k, k] == x && Board[k,k] == x && Board[k, k] == x) || (Board[k,k] == o && Board[k, k] == o && Board[k, k] == o))
+                Moves.Values.ToList().ForEach(m =>
                 {
-                    Moves.Values.ToList().ForEach(m =>
+                    if (m.Y == m.X)
                     {
-                        if (m.Y == m.X)
-                        {
-                            m.IsWinningMove = true;
-                        }
-                        else
-                        {
-                            m.IsWinningMove = false;
-                        }
-                    });
-                    return true;
-                }
+                        m.IsWinningMove = true;
+                    }
+                    else
+                    {
+                        m.IsWinningMove = false;
+                    }
+                });
+                return true;
             }
 
             //secondaire
-            for (int k = 0; k < Game.Dimension; k++)
+            if ((Board[0, 2] == x && Board[1, 1] == x && Board[2,0] == x) || (Board[0,2] == o && Board[1,1] == o && Board[2, 0] == o))
             {
-                if ((Board[k, Game.Dimension - k - 1] == x && Board[k, Game.Dimension - k - 1] == x && Board[k, Game.Dimension - k - 1] == x) || (Board[k, Game.Dimension - k - 1] == o && Board[k, Game.Dimension - k - 1] == o && Board[k, Game.Dimension - k - 1] == o))
+                Moves.Values.ToList().ForEach(m =>
                 {
-                    Moves.Values.ToList().ForEach(m =>
+                    if ((m.X==0 && m.Y ==2)||(m.X==1 && m.Y ==1)||(m.X==2 && m.Y ==0))
                     {
-                        if (m.Y == m.X)
-                        {
-                            m.IsWinningMove = true;
-                        }
-                        else
-                        {
-                            m.IsWinningMove = false;
-                        }
-                    });
-                    return true;
-                }
+                        m.IsWinningMove = true;
+                    }
+                    else
+                    {
+                        m.IsWinningMove = false;
+                    }
+                });
+                return true;
             }
 
             return false;
