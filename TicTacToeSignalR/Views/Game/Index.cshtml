@@ -216,10 +216,11 @@
             gameContextNamespace.IsGameOver = false;
             gameContextNamespace.LastMove = '';
             gameContextNamespace.MovesList = [];
+
+            $('.summary > div').remove();
+            $('#notification-panel').html('').removeClass().addClass('green');
         }
     };
-
-
 
     $(function () {
         //signalR
@@ -354,7 +355,8 @@
             proxy.server.quitToLobby(gameId, $.connection.gameHub.connection.id)
         }
 
-        proxy.client.clientShowLobby = function() {
+        proxy.client.clientShowLobby = function () {
+            gameContextNamespace.ClearPreviousGame();
             $('#gameplace').html('');
             $('.board-wrapper').css('display', 'none');
             $('#btn-lobby').css('display', 'none')
