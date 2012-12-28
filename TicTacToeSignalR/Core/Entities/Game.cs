@@ -19,6 +19,7 @@ namespace TicTacToeSignalR
         private Player _winner;
         private char[,] _board;
         private SortedList<int, Movement> _moves;
+        private string _result;
         #endregion
 
         public Guid GameId
@@ -49,6 +50,10 @@ namespace TicTacToeSignalR
         public SortedList<int, Movement> Moves
         {
             get { return _moves; }
+        }
+        public string Result
+        {
+            get { return _result; }
         }
 
         public event EventHandler<NotificationEventArgs<Movement>> PlayerHasMovedPiece;
@@ -108,6 +113,7 @@ namespace TicTacToeSignalR
             Player2 = p2;
             Winner = null;
             _moves = moves;
+            _result = GameResult.None;
 	    }
         #endregion
 
@@ -158,16 +164,18 @@ namespace TicTacToeSignalR
                     if (this.IsWon())
                     {
                         this.Winner = from;
-                        RaisePlayerHasMoved(new NotificationEventArgs<Movement>(replyTo.Id, from.Nick + move.ToString(), move));
-                        RaiseWonGame(new NotificationEventArgs<Game>(this));
-                        return true;
+                        _result = GameResult.Won;
+
                     }
-                    else
+                    else if(this.IsDraw())
                     {
-                        RaisePlayerHasMoved(new NotificationEventArgs<Movement>(replyTo.Id, from.Nick + move.ToString(), move));
-                        RaiseUpdateSummary(new NotificationEventArgs<Game>(this));
-                        return true;
+                        this.Winner = null;
+                        _result = GameResult.Draw;
                     }
+
+                    RaisePlayerHasMoved(new NotificationEventArgs<Movement>(replyTo.Id, from.Nick + move.ToString(), move));
+                    RaiseWonGame(new NotificationEventArgs<Game>(this));
+                    return true;
                 }
             }
             //else
@@ -263,6 +271,10 @@ namespace TicTacToeSignalR
             }
 
             return false;
+        }
+        private bool IsDraw()
+        {
+            return Moves.Count == (Game.Dimension * Game.Dimension);
         }
         private bool isValidMove(Movement move, string playerId)
         {

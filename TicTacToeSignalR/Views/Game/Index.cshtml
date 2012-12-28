@@ -211,6 +211,11 @@
             else {
                 throw new Error("Parameter <piece> must be a not null char.");
             }
+        },
+        ClearPreviousGame: function () {
+            gameContextNamespace.IsGameOver = false;
+            gameContextNamespace.LastMove = '';
+            gameContextNamespace.MovesList = [];
         }
     };
 
@@ -238,16 +243,24 @@
                     });
                 }
                 //notify players
-                if (game.Winner != null) {
+                if (game.Result == 'Won') {
                     if (game.Winner.Id == $.connection.gameHub.connection.id) {
-                        proxy.clie.notify({ Message: 'YOU WIN!!!!!!', Type: 'blue' });
+                        proxy.client.notify({ Message: 'YOU WIN!!!!!!', Type: 'blue' });
                     }
                     else {
-                        proxy.clie.notify({ Message: 'YOU LOSE!', Type: 'red' });
+                        proxy.client.notify({ Message: 'YOU LOSE!', Type: 'red' });
                     }
+                    gameContextNamespace.IsGameOver = true;
+                    return;
                 }
-                gameContextNamespace.IsGameOver = true;
-
+                else if (game.Result == 'Draw') {
+                    proxy.client.notify({ Message: 'ITS A DRAW!', Type: 'blue' });
+                    $.each(game.Moves, function (index, move) {
+                        $('.board td a[data-x="' + move.X + '"][data-y="' + move.Y + '"]').removeClass().addClass('won' + move.Piece);
+                    });
+                    gameContextNamespace.IsGameOver = true;
+                    return;
+                }
             }
         }
 
@@ -283,7 +296,12 @@
                 gameContextNamespace.LastMove = paramPiece;
             }
             else {
-                proxy.client.notify({Message : 'Impossible. Invalid move',Type:'red'});
+                if (gameContextNamespace.IsGameOver) {
+                    proxy.client.notify({ Message: 'GAME OVER!', Type: 'red' });
+                }
+                else {
+                    proxy.client.notify({ Message: 'Impossible. Invalid move', Type: 'red' });
+                }
             }
         }
 
@@ -322,6 +340,7 @@
         }
 
         proxy.client.clientExitGame = function () {
+            gameContextNamespace.ClearPreviousGame();
             var gameId = $('.board').attr('data-id');
             proxy.server.exitGame(gameId,$.connection.gameHub.connection.id);
         }
@@ -329,7 +348,8 @@
             window.location.href = "/";
         }
         
-        proxy.client.clientQuitToLobby = function() {
+        proxy.client.clientQuitToLobby = function () {
+            gameContextNamespace.ClearPreviousGame();
             var gameId = $('.board').attr('data-id');
             proxy.server.quitToLobby(gameId, $.connection.gameHub.connection.id)
         }

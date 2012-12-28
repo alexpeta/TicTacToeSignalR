@@ -21,19 +21,18 @@
                 @RenderBody()
             </section>
         </div>
-@*        <footer>
+        <footer>
             <div class="content-wrapper">
-                <div class="float-left">
-                    <p>&copy; @DateTime.Now.Year - TicTacToe with SignalR</p>
+                <div class="float-left" style="text-align:right;">
+                    <a href="http://alexpeta.ro" title="Alex Peta">
+                        <img src="~/Content/logo_black_117x117.png" border="0" style="width:50%;height:50%;margin-right:10px;" />
+                    </a>
                 </div>
                 <div class="float-right">
-                    <ul id="social">
-                        <li><a href="http://facebook.com" class="facebook">Facebook</a></li>
-                        <li><a href="http://twitter.com" class="twitter">Twitter</a></li>
-                    </ul>
+                    <p>&copy; @DateTime.Now.Year - <a href="http://alexpeta.ro" title="Alex Peta">by Alex Peta</a></p>
                 </div>
             </div>
-        </footer>*@
+        </footer>
         @RenderSection("scripts", required: false)
 
     </body>

@@ -115,10 +115,12 @@ h5, h6 {
     }
 
 footer {
+    position:absolute;
+    bottom:0px;
     clear: both;
-    background-color: #e2e2e2;
+    /*background-color: #e2e2e2;*/
     font-size: .8em;
-    height: 100px;
+    vertical-align:bottom;
 }
 
 
@@ -747,6 +749,8 @@ tr.pager td {
     footer .float-left,
     footer .float-right {
         float: none;
+        display:block;
+        text-decoration:none;
     }
 
     footer {
@@ -754,23 +758,13 @@ tr.pager td {
         height: auto;
         padding: 10px 0;
     }
-
-        footer p {
-            margin: 0;
+        footer img {
+            vertical-align:bottom;
+        }
+        footer a:hover {
+            background:inherit;
         }
 
-        ul#social {
-            padding: 0;
-            margin: 0;
-        }
-
-        a.facebook, a.twitter {
-            background: none;
-            display: inline;
-            float: none;
-            padding-left: 0;
-            text-indent: 0;
-        }
 }
 
 /* first page index */

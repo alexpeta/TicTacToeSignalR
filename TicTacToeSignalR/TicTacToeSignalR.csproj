@@ -156,6 +156,7 @@
     <Compile Include="Core\Entities\Player.cs" />
     <Compile Include="Core\Entities\UserNotification.cs" />
     <Compile Include="Core\Enums\Avatars.cs" />
+    <Compile Include="Core\Enums\GameResult.cs" />
     <Compile Include="Core\Enums\Nicknames.cs" />
     <Compile Include="Core\Enums\UserNotificationType.cs" />
     <Compile Include="Core\Mechanics\GameHub.cs" />
@@ -204,6 +205,8 @@
     <Content Include="Content\avatars\IDR_PROFILE_AVATAR_7.png" />
     <Content Include="Content\avatars\IDR_PROFILE_AVATAR_8.png" />
     <Content Include="Content\avatars\IDR_PROFILE_AVATAR_9.png" />
+    <Content Include="Content\logo_black_117x117.png" />
+    <Content Include="Content\logo_white_117x117.png" />
     <Content Include="Content\themes\base\images\bg.png" />
     <Content Include="Content\themes\base\images\o.png" />
     <Content Include="Content\themes\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />

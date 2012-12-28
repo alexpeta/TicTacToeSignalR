@@ -244,6 +244,7 @@ namespace TicTacToeSignalR.Core.Mechanics
             catch
             {
                 return Task.Factory.StartNew(() => GetConnectedPlayers());
+                
             }
         }
         #endregion Overrides
