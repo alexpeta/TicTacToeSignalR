@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Web.Mvc;
+using System.Web.Security;
 using TicTacToeSignalR.Core;
 using TicTacToeSignalR.Core.Enums;
 using TicTacToeSignalR.Core.Mechanics;
@@ -66,6 +67,7 @@ namespace TicTacToeSignalR.Controllers
                 avatarNick = AvatarsHelper.GetRandomAvatar();
             }
 
+            FormsAuthentication.SetAuthCookie(cookieNick, true);
             ProfileViewModel viewModel = new ProfileViewModel(cookieNick, avatarNick, this.GetAvatarList());
 
             return View(viewModel);

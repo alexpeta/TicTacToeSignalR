@@ -72,6 +72,9 @@
     <Report>
       <Path>TicTacToeSignalR_121220.vsp</Path>
     </Report>
+    <Report>
+      <Path>TicTacToeSignalR_121229.vsp</Path>
+    </Report>
   </Reports>
   <Launches>
     <ProjBinary>

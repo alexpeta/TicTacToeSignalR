@@ -39,5 +39,3 @@ C:\Users\Alex\Documents\Visual Studio 2012\Projects\TicTacToeSignalR\TicTacToeSi
 C:\Users\Alex\Documents\Visual Studio 2012\Projects\TicTacToeSignalR\TicTacToeSignalR\bin\System.Web.WebPages.Razor.xml
 C:\Users\Alex\Documents\Visual Studio 2012\Projects\TicTacToeSignalR\TicTacToeSignalR\obj\Release\TicTacToeSignalR.dll
 C:\Users\Alex\Documents\Visual Studio 2012\Projects\TicTacToeSignalR\TicTacToeSignalR\obj\Release\TicTacToeSignalR.pdb
-C:\Users\Alex\Documents\Visual Studio 2012\Projects\TicTacToeSignalR\TicTacToeSignalR\bin\TicTacToeSignalR.dll.CodeAnalysisLog.xml
-C:\Users\Alex\Documents\Visual Studio 2012\Projects\TicTacToeSignalR\TicTacToeSignalR\bin\TicTacToeSignalR.dll.lastcodeanalysissucceeded

@@ -30,6 +30,7 @@ namespace TicTacToeSignalR.Core.Mechanics
         #endregion
 
         #region Public Methods
+        //TODO: create auto-close feature
         public void AutoCloseInvite(Guid inviteId)
         {
             if (inviteId != Guid.Empty)
@@ -121,7 +122,7 @@ namespace TicTacToeSignalR.Core.Mechanics
         }
         public void GetConnectedPlayers()
         {
-            var playersList = _lobby.Values.OrderBy(p=>p.Nick).ToList();
+            var playersList = _lobby.Values.OrderBy(p => p.Nick);
             Clients.All.refreshPlayersList(playersList);
         }
 
@@ -174,12 +175,6 @@ namespace TicTacToeSignalR.Core.Mechanics
             }
         }
 
-        public string Testing()
-        {
-            return "testing 123";
-        }
-
-
         #region Handle Events
         public void OnPlayerHasMovedPiece(object sender, NotificationEventArgs<Movement> e)
         {
@@ -224,6 +219,10 @@ namespace TicTacToeSignalR.Core.Mechanics
         #endregion Handle Events
 
         #region Overrides
+        //public override Task OnConnected()
+        //{
+        //    return Task.Factory.StartNew(() => { });
+        //}        
         public override Task OnDisconnected()
         {
             try
