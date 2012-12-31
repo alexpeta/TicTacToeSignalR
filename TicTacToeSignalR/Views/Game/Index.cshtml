@@ -245,7 +245,7 @@
                     });
                 }
                 //notify players
-                if (game.Result == 'Won') {
+                if (game.Result == 'PlayerWon' || game.Winner != null) {
                     if (game.Winner.Id == $.connection.gameHub.connection.id) {
                         proxy.client.notify({ Message: 'YOU WIN!!!!!!', Type: 'blue' });
                     }
@@ -253,7 +253,6 @@
                         proxy.client.notify({ Message: 'YOU LOSE!', Type: 'red' });
                     }
                     gameContextNamespace.IsGameOver = true;
-                    return;
                 }
                 else if (game.Result == 'Draw') {
                     proxy.client.notify({ Message: 'ITS A DRAW!', Type: 'blue' });
@@ -261,8 +260,8 @@
                         $('.board td a[data-x="' + move.X + '"][data-y="' + move.Y + '"]').removeClass().addClass('won' + move.Piece);
                     });
                     gameContextNamespace.IsGameOver = true;
-                    return;
                 }
+                proxy.client.appendSummary(game.Winner.Nick + ' won the match');
             }
         }
 

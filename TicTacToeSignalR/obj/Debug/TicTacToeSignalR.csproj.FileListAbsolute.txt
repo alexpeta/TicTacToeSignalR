@@ -37,6 +37,6 @@ C:\Users\Alex\Documents\Visual Studio 2012\Projects\TicTacToeSignalR\TicTacToeSi
 C:\Users\Alex\Documents\Visual Studio 2012\Projects\TicTacToeSignalR\TicTacToeSignalR\bin\System.Web.WebPages.xml
 C:\Users\Alex\Documents\Visual Studio 2012\Projects\TicTacToeSignalR\TicTacToeSignalR\bin\System.Web.WebPages.Deployment.xml
 C:\Users\Alex\Documents\Visual Studio 2012\Projects\TicTacToeSignalR\TicTacToeSignalR\bin\System.Web.WebPages.Razor.xml
-C:\Users\Alex\Documents\Visual Studio 2012\Projects\TicTacToeSignalR\TicTacToeSignalR\obj\Release\TicTacToeSignalR.dll
-C:\Users\Alex\Documents\Visual Studio 2012\Projects\TicTacToeSignalR\TicTacToeSignalR\obj\Release\TicTacToeSignalR.pdb
-C:\Users\Alex\Documents\Visual Studio 2012\Projects\TicTacToeSignalR\TicTacToeSignalR\obj\Release\TicTacToeSignalR.csprojResolveAssemblyReference.cache
+C:\Users\Alex\Documents\Visual Studio 2012\Projects\TicTacToeSignalR\TicTacToeSignalR\obj\Debug\TicTacToeSignalR.dll
+C:\Users\Alex\Documents\Visual Studio 2012\Projects\TicTacToeSignalR\TicTacToeSignalR\obj\Debug\TicTacToeSignalR.pdb
+C:\Users\Alex\Documents\Visual Studio 2012\Projects\TicTacToeSignalR\TicTacToeSignalR\obj\Debug\TicTacToeSignalR.csprojResolveAssemblyReference.cache

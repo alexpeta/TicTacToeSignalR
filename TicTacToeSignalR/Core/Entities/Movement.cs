@@ -7,14 +7,15 @@ namespace TicTacToeSignalR
 {
     public class Movement
     {
+        #region Private Members
         private Player _player;
         private int _x;
         private int _y;
         private char _piece;
         private bool _isWinningMove;
+        #endregion
 
-
-
+        #region Public Properties
         public int X
         {
             get { return _x; }
@@ -40,7 +41,9 @@ namespace TicTacToeSignalR
             get { return _isWinningMove; }
             set { _isWinningMove = value; }
         }
+        #endregion
 
+        #region Constructors
         public Movement() : this(0,0,char.MinValue,null,false)
         {
         }
@@ -52,6 +55,7 @@ namespace TicTacToeSignalR
             Player = player;
             IsWinningMove = isWinningMove;
         }
+        #endregion
 
         #region Overrides
         public override string ToString()

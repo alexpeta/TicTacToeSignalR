@@ -40,7 +40,14 @@ namespace TicTacToeSignalR
         public Player Winner
         {
             get { return _winner; }
-            set { _winner = value; }
+            internal set 
+            { 
+                _winner = value;
+                if (value != null)
+                {
+                    RaiseWonGame(new NotificationEventArgs<Game>(this));
+                }
+            }
         }
         public char[,] Board
         {
@@ -51,9 +58,19 @@ namespace TicTacToeSignalR
         {
             get { return _moves; }
         }
+
         public string Result
         {
             get { return _result; }
+            private set 
+            { 
+                _result = value;
+                //if (_winner == null && value != GameResult.None)
+                if(value == GameResult.Draw || value == GameResult.AIWon)
+                {
+                    RaiseWonGame(new NotificationEventArgs<Game>(this));
+                }
+            }
         }
 
         public event EventHandler<NotificationEventArgs<Movement>> PlayerHasMovedPiece;
@@ -133,67 +150,57 @@ namespace TicTacToeSignalR
                 return false;
             }
 
-            //if (this.Moves.Count > 4 && this.Winner != null && this.Winner != Player.Null)
+            Player replyTo = null;
+            Player from = null;
+            if (this.Player1.Id != playerId)
             {
-                Player replyTo = null;
-                Player from = null;
-                if (this.Player1.Id != playerId)
-                {
-                    replyTo = this.Player1;
-                    from = this.Player2;
-                }
-                else
-                {
-                    replyTo = this.Player2;
-                    from = this.Player1;
-                }
-
-                if (!isValidMove(move, playerId))
-                {
-                    NotificationEventArgs<string> args = new NotificationEventArgs<string>();
-                    args.Message = "Impossible. Invalid move!";
-                    RaiseErrorOccurred(args);
-                    return false;
-                }
-                else
-                {
-                    move.Player = from;
-                    Board[move.X, move.Y] = move.Piece;
-                    Moves.Add(Moves.Count, move);
-
-                    if (this.IsWon())
-                    {
-                        this.Winner = from;
-                        _result = GameResult.Won;
-
-                    }
-                    else if(this.IsDraw())
-                    {
-                        this.Winner = null;
-                        _result = GameResult.Draw;
-                    }
-
-                    RaisePlayerHasMoved(new NotificationEventArgs<Movement>(replyTo.Id, from.Nick + move.ToString(), move));
-                    RaiseWonGame(new NotificationEventArgs<Game>(this));
-                    return true;
-                }
+                replyTo = this.Player1;
+                from = this.Player2;
             }
-            //else
+            else
             {
-            //    return false;
+                replyTo = this.Player2;
+                from = this.Player1;
+            }
+
+            if (!isValidMove(move, playerId))
+            {
+                NotificationEventArgs<string> args = new NotificationEventArgs<string>();
+                args.Message = "Impossible. Invalid move!";
+                RaiseErrorOccurred(args);
+                return false;
+            }
+            else
+            {
+                move.Player = from;
+                Board[move.X, move.Y] = move.Piece;
+                Moves.Add(Moves.Count, move);
+                RaisePlayerHasMoved(new NotificationEventArgs<Movement>(replyTo.Id, from.Nick + move.ToString(), move));
+
+                if (this.IsWon())
+                {
+                    this.Winner = from;
+                    Result = GameResult.PlayerWon;
+                }
+                else if(this.IsDraw())
+                {
+                    this.Winner = null;
+                    Result = GameResult.Draw;
+                }
+                return true;
             }
         }
         
         private bool IsWon()
-        {
-            char x = 'x';
-            char o = 'o';
+        {            
             //its turn-based so you can get a 3rd piece to win the earliest at the 5th turn
             if (Moves.Count<=4)
             {
                 return false;
             }
 
+            char x = 'x';
+            char o = 'o';
             //rows
             for (int i = 0; i < Game.Dimension; i++)
             {
@@ -302,21 +309,6 @@ namespace TicTacToeSignalR
             //    }
             //}
             return true;
-        }
-
-        [Obsolete]
-        private void FillBoard()
-        {
-            char[] pieces = new char[3]{char.MinValue,'x','o'};
-            Random r = new Random();
-
-            for (int i = 0; i < Game.Dimension; i++)
-            {
-                for (int j = 0; j < Game.Dimension; j++)
-                {
-                    Board[i, j] = pieces[r.Next(0, Game.Dimension)];
-                }
-            }
         }
 
     }

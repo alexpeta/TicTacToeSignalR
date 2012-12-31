@@ -36,7 +36,6 @@ namespace TicTacToeSignalR.Core.Mechanics
             if (inviteId != Guid.Empty)
             {
                 Invitation sentInvite = InviteManager.GetInvitationByInvitationId(inviteId);
-                //HubInviteManager.RemoveInvite(inviteId);
                 Clients.Client(sentInvite.From.Id.ToString()).test(string.Format("Your invite to {0} has expired.",sentInvite.From.Nick));
             }
         }
@@ -44,9 +43,10 @@ namespace TicTacToeSignalR.Core.Mechanics
         {
             if (answer == null)
             {
-                //TODO: make this more robust.
-                Clients.Caller.test("Error sending response.");
+                Clients.Caller.notify(new UserNotification("Error sending invite answer!", UserNotificationType.Red));
+                return; 
             }
+
             InviteStatus status = InviteManager.ValidateAnswer(answer);
             Invitation invitation = InviteManager.ExtractInvite(answer.InviteId);
 
@@ -55,28 +55,27 @@ namespace TicTacToeSignalR.Core.Mechanics
                 case InviteStatusType.Invalid:
                 case InviteStatusType.Valid:
                 case InviteStatusType.Rejected:
-                    Clients.Client(invitation.From.Id.ToString()).test(status.Message);
-                    break;
+                    Clients.Caller.notify(new UserNotification(status.Message, UserNotificationType.Red));
+                    return;
                 case InviteStatusType.Accepted:
                 default:
                     //create the new game
                     Game game = GameManager.CreateGame(invitation);
-
-                    //lets subscribe to game stuff here
-                    game.PlayerHasMovedPiece += OnPlayerHasMovedPiece;
-                    game.ErrorOccurred += OnErrorOccured;
-                    game.UpdateSummary += OnUpdateSummary;
-                    game.WonGame += OnWonGame;
-
+                    
                     if (game != null)
                     {
+                        //lets subscribe to game stuff here
+                        game.PlayerHasMovedPiece += OnPlayerHasMovedPiece;
+                        game.ErrorOccurred += OnErrorOccured;
+                        game.UpdateSummary += OnUpdateSummary;
+                        game.WonGame += OnWonGame;
+
                         Player p1 = null;
                         Player p2 = null;
                         _lobby.TryRemove(game.Player1.Id, out p1);
                         _lobby.TryRemove(game.Player2.Id, out p2);
-                        p1 = null;
-                        p2 = null;
-                        GetConnectedPlayers();
+                        
+                        //GetConnectedPlayers();
 
                         //start the game for the players.
                         //List<Player> gamePlayers = GameManager.GetPlayersListByGameId(game.GameId);
@@ -85,7 +84,7 @@ namespace TicTacToeSignalR.Core.Mechanics
                     }
                     else
                     {
-                        Clients.All.test("error game is null");
+                        Clients.Caller.notify(new UserNotification("Error occurred when sending game invitation answer.", UserNotificationType.Red));
                     }
                     break;
             }
@@ -100,26 +99,27 @@ namespace TicTacToeSignalR.Core.Mechanics
         {
             if (invitation != null)
             {
-                invitation.ErrorOccurred -= OnErrorOccured;
                 invitation.ErrorOccurred += OnErrorOccured;
                 InviteStatus status = InviteManager.IsValidInvite(invitation);
                 switch (status.StatusType)
                 {
                     case InviteStatusType.Invalid:
                     case InviteStatusType.Rejected:
-                        Clients.Client(invitation.From.Id.ToString()).test(status.Message);
+                        Clients.Caller.notify(new UserNotification(status.Message, UserNotificationType.Red));
                         break;
                     case InviteStatusType.Valid:
                     default:
-                        Clients.Client(invitation.To.Id.ToString()).showInviteModal(invitation.InviteToMarkup());
+                        Clients.Client(invitation.To.Id).showInviteModal(invitation.InviteToMarkup());
                         break;
                 }
             }
         }
+
         public void ServerCallMovePiece(Guid gameId, Movement move, string playerId)
         {
             GameManager.AddGameMove(gameId, move, playerId);
         }
+
         public void GetConnectedPlayers()
         {
             var playersList = _lobby.Values.OrderBy(p => p.Nick);
@@ -248,7 +248,6 @@ namespace TicTacToeSignalR.Core.Mechanics
         }
         #endregion Overrides
         #endregion Public Methods
-
-
+        
     }
 }
