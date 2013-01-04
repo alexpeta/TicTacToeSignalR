@@ -75,7 +75,7 @@ namespace TicTacToeSignalR.Tests
         }
 
         [TestMethod]
-        public void Game_AddMove_RaisesIsWonEventWhenAddingWinningMove()
+        public void Game_AddMove_RaisesIsWonEventWhenAddingWinningMoveOnMainDiagonal()
         {
             //Arrange
             NotificationEventArgs<Game> argsWhenGameIsWon = null;
@@ -102,6 +102,83 @@ namespace TicTacToeSignalR.Tests
             Assert.IsNotNull(_game.Winner);
         }
 
+        [TestMethod]
+        public void Game_AddMove_RaisesIsWonEventWhenAddingWinningMoveOnRow()
+        {
+            //Arrange
+            NotificationEventArgs<Game> argsWhenGameIsWon = null;
+            _game.WonGame += new EventHandler<NotificationEventArgs<Game>>((o, e) => { argsWhenGameIsWon = e; });
+
+            Movement m1 = new Movement(0, 0, 'x', _p1, true);
+            Movement m2 = new Movement(1, 1, 'o', _p2, false);
+            Movement m3 = new Movement(0, 1, 'x', _p1, true);
+            Movement m4 = new Movement(2, 2, 'o', _p2, false);
+            Movement m5 = new Movement(0, 2, 'x', _p1, true);
+
+            //Act
+            bool moveAdded = _game.AddMove(m1, _p1.Id);
+            moveAdded = _game.AddMove(m2, _p2.Id);
+            moveAdded = _game.AddMove(m3, _p1.Id);
+            moveAdded = _game.AddMove(m4, _p2.Id);
+            moveAdded = _game.AddMove(m5, _p1.Id);
+
+            //Assert
+            Assert.AreEqual<Game>(argsWhenGameIsWon.Value, _game);
+            Assert.IsNotNull(_game.Winner);
+        }
+
+
+        [TestMethod]
+        public void Game_AddMove_RaisesIsWonEventWhenAddingWinningMoveOnSecondaryDiagonal()
+        {
+            //Arrange
+            NotificationEventArgs<Game> argsWhenGameIsWon = null;
+            _game.WonGame += new EventHandler<NotificationEventArgs<Game>>((o, e) => { argsWhenGameIsWon = e; });
+
+            Movement m1 = new Movement(0, 0, 'x', _p1, false);
+            Movement m2 = new Movement(0, 2, 'o', _p2, true);
+            Movement m3 = new Movement(0, 1, 'x', _p1, false);
+            Movement m4 = new Movement(1, 1, 'o', _p2, true);
+            Movement m5 = new Movement(1, 0, 'x', _p1, false);
+            Movement m6 = new Movement(2, 0, 'o', _p2, true);
+
+            //Act
+            bool moveAdded = _game.AddMove(m1, _p1.Id);
+            moveAdded = _game.AddMove(m2, _p2.Id);
+            moveAdded = _game.AddMove(m3, _p1.Id);
+            moveAdded = _game.AddMove(m4, _p2.Id);
+            moveAdded = _game.AddMove(m5, _p1.Id);
+            moveAdded = _game.AddMove(m6, _p2.Id);
+
+            //Assert
+            Assert.AreEqual<Game>(argsWhenGameIsWon.Value, _game);
+            Assert.IsNotNull(_game.Winner);
+        }
+
+        [TestMethod]
+        public void Game_AddMove_RaisesIsWonEventWhenAddingWinningMoveOnColumn()
+        {
+            //Arrange
+            NotificationEventArgs<Game> argsWhenGameIsWon = null;
+            _game.WonGame += new EventHandler<NotificationEventArgs<Game>>((o, e) => { argsWhenGameIsWon = e; });
+
+            Movement m1 = new Movement(0, 0, 'x', _p1, false);
+            Movement m2 = new Movement(0, 2, 'o', _p2, true);
+            Movement m3 = new Movement(1, 0, 'x', _p1, false);
+            Movement m4 = new Movement(1, 1, 'o', _p2, true);
+            Movement m5 = new Movement(2, 0, 'x', _p1, false);
+
+            //Act
+            bool moveAdded = _game.AddMove(m1, _p1.Id);
+            moveAdded = _game.AddMove(m2, _p2.Id);
+            moveAdded = _game.AddMove(m3, _p1.Id);
+            moveAdded = _game.AddMove(m4, _p2.Id);
+            moveAdded = _game.AddMove(m5, _p1.Id);
+
+            //Assert
+            Assert.AreEqual<Game>(argsWhenGameIsWon.Value, _game);
+            Assert.IsNotNull(_game.Winner);
+        }
 
     }
 }

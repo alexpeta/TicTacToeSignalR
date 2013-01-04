@@ -175,7 +175,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utility\CookieManager.cs" />
     <Compile Include="Utility\Extensions.cs" />
-    <Compile Include="ViewModel\GameViewModel.cs" />
     <Compile Include="ViewModel\ProfileViewModel.cs" />
   </ItemGroup>
   <ItemGroup>

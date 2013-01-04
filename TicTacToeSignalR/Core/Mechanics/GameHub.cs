@@ -75,10 +75,7 @@ namespace TicTacToeSignalR.Core.Mechanics
                         _lobby.TryRemove(game.Player1.Id, out p1);
                         _lobby.TryRemove(game.Player2.Id, out p2);
                         
-                        //GetConnectedPlayers();
-
                         //start the game for the players.
-                        //List<Player> gamePlayers = GameManager.GetPlayersListByGameId(game.GameId);
                         Clients.Client(game.Player1.Id.ToString()).clientRenderBoard(GameManager.GetBoardMarkup(game.GameId, game.Player1.Id), game);
                         Clients.Client(game.Player2.Id.ToString()).clientRenderBoard(GameManager.GetBoardMarkup(game.GameId, game.Player2.Id), game);
                     }
@@ -92,6 +89,11 @@ namespace TicTacToeSignalR.Core.Mechanics
 
         public void PlayerJoined(Player johnDoe)
         {
+            if (johnDoe == null || johnDoe == Player.Null)
+            {
+                Clients.Caller.notify(new UserNotification("Error occurred when joining game!", UserNotificationType.Red));
+            }
+
             _lobby.TryAdd(johnDoe.Id, johnDoe);
             GetConnectedPlayers();
         }
@@ -218,11 +220,7 @@ namespace TicTacToeSignalR.Core.Mechanics
         }
         #endregion Handle Events
 
-        #region Overrides
-        //public override Task OnConnected()
-        //{
-        //    return Task.Factory.StartNew(() => { });
-        //}        
+        #region Overrides      
         public override Task OnDisconnected()
         {
             try
