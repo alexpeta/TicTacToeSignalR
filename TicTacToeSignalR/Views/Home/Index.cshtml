@@ -38,6 +38,10 @@
                 <input type="text" name="nick" id="nick" style="width:170px;padding:3px;" value="@Model.Nick"/>
                 <input type="submit" class="button" value="Accept" />
             }
+            @using (Html.BeginForm("Randomize", "Home", FormMethod.Post, null))
+            {
+                <input type="submit" class="button" value="Randomize" style="margin-top:10px;"/>
+            }
         </div>
     </div>
 </div>

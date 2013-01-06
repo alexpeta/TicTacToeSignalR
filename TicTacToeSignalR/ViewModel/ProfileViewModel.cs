@@ -8,28 +8,29 @@ namespace TicTacToeSignalR.ViewModel
 {
     public class ProfileViewModel
     {
+        #region Private Members
         private List<string> _avatarsList = new List<string>();
         private string _nick;
         private string _avatar;
+        #endregion
 
+        #region Public Properties
         public List<string> AvatarsList
         {
             get { return _avatarsList; }
             set { _avatarsList = value; }
         }
-
         public string Nick
         {
             get { return _nick; }
             set { _nick = value; }
         }
-
         public string Avatar
         {
             get { return _avatar; }
             set { _avatar = value; }
         }
-
+        #endregion
 
         #region Constructors
         public ProfileViewModel(): this(string.Empty,string.Empty,new List<string>())

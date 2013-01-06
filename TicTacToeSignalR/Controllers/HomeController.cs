@@ -77,7 +77,7 @@ namespace TicTacToeSignalR.Controllers
         [HttpPost]
         public ActionResult Index(ProfileViewModel profile)
         {
-            if (string.IsNullOrEmpty(profile.Nick) || string.IsNullOrEmpty(profile.Avatar) || GameHub.NickIsInUse(profile.Nick))
+            if (profile == null || string.IsNullOrEmpty(profile.Nick) || string.IsNullOrEmpty(profile.Avatar) || GameHub.NickIsInUse(profile.Nick))
             {
                 profile.AvatarsList = this.GetAvatarList();
                 profile.Nick = NicknamesHelper.GetRandomNick();
@@ -93,6 +93,18 @@ namespace TicTacToeSignalR.Controllers
             }
         }
 
+        [HttpPost]
+        public ActionResult Randomize()
+        {
+            ProfileViewModel profile = new ProfileViewModel();
+            profile.AvatarsList = this.GetAvatarList();
+            profile.Nick = NicknamesHelper.GetRandomNick();
+            profile.Avatar = AvatarsHelper.GetRandomAvatar();
+            CookieManager.WriteCookie(this.HttpContext, CookieManager.UserCookieName, profile.Nick);
+            CookieManager.WriteCookie(this.HttpContext, CookieManager.AvatarCookieName, profile.Avatar);
+            TempData["profileData"] = profile;
+            return RedirectToAction("Index", "Game");
+        }
 
         public ActionResult About()
         {

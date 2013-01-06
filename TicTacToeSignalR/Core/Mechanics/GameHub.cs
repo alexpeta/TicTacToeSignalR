@@ -55,7 +55,7 @@ namespace TicTacToeSignalR.Core.Mechanics
                 case InviteStatusType.Invalid:
                 case InviteStatusType.Valid:
                 case InviteStatusType.Rejected:
-                    Clients.Caller.notify(new UserNotification(status.Message, UserNotificationType.Red));
+                    Clients.Client(invitation.From.Id).notify(new UserNotification(status.Message, UserNotificationType.Red));
                     return;
                 case InviteStatusType.Accepted:
                 default:
@@ -136,6 +136,7 @@ namespace TicTacToeSignalR.Core.Mechanics
                 _lobby.TryAdd(gameToQuit.Player1.Id, gameToQuit.Player1);
                 _lobby.TryAdd(gameToQuit.Player2.Id, gameToQuit.Player2);
 
+                //TODO : save to persistent state;
                 Clients.Client(gameToQuit.Player1.Id).clientShowLobby();
                 Clients.Client(gameToQuit.Player2.Id).clientShowLobby();
             }
@@ -158,10 +159,11 @@ namespace TicTacToeSignalR.Core.Mechanics
                 Game gameToQuit = GameManager.QuitGame(gameId, playerWhoQuitsId);
                 if (gameToQuit != null)
                 {
-                    string playerToJoinLobby = gameToQuit.Player1.Id == playerWhoQuitsId ? gameToQuit.Player2.Id : gameToQuit.Player1.Id;
-
+                    Player playerToJoinLobby = gameToQuit.Player1.Id == playerWhoQuitsId ? gameToQuit.Player2 : gameToQuit.Player1;
+                    _lobby.TryAdd(playerToJoinLobby.Id, playerToJoinLobby);
+                    
                     Clients.Client(playerWhoQuitsId).exitGame();
-                    Clients.Client(playerToJoinLobby).clientShowLobby();
+                    Clients.Client(playerToJoinLobby.Id).clientShowLobby();
                 }
             }
             else
@@ -232,8 +234,12 @@ namespace TicTacToeSignalR.Core.Mechanics
                 {
                     //check to see if he is in a game
                     Game game = GameManager.QuitGame(Guid.Empty, playerWhoExitsId);
-                    string playerToJoinLobby = game.Player1.Id == playerWhoExitsId ? game.Player2.Id : game.Player1.Id;
-                    Clients.Client(playerToJoinLobby).clientShowLobby();
+                    //string playerToJoinLobby = game.Player1.Id == playerWhoExitsId ? game.Player2.Id : game.Player1.Id;
+                    if (game != null)
+                    {
+                        _lobby.TryAdd(game.Winner.Id, game.Winner);
+                    }
+                    Clients.Client(game.Winner.Id).clientShowLobby();
                 }
 
                 return Task.Factory.StartNew(() => GetConnectedPlayers());

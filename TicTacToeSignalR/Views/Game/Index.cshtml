@@ -364,12 +364,12 @@
             $('#game-session-players > li').remove();
             $('#game-session').css('display', 'none');
 
-            proxy.server.playerJoined(
-            {
-                Nick: proxy.state.name,
-                Id: $.connection.gameHub.connection.id,
-                Avatar: proxy.state.avatar
-            });
+            //proxy.server.playerJoined(
+            //{
+            //    Nick: proxy.state.name,
+            //    Id: $.connection.gameHub.connection.id,
+            //    Avatar: proxy.state.avatar
+            //});
         }
         
         proxy.client.sendAnswer = function (id, answer) {
