@@ -149,6 +149,7 @@ namespace TicTacToeSignalR.Core.Mechanics
                 Clients.Client(gameToQuit.Player1.Id).clientShowLobby();
                 Clients.Client(gameToQuit.Player2.Id).clientShowLobby();
             }
+            GetConnectedPlayers();
         }
 
         public void ExitGame(string gameStringId,string playerWhoQuitsId)
