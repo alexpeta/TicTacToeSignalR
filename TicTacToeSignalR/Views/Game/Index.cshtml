@@ -363,17 +363,17 @@
             $('#lobby').fadeIn(100);
             $('#game-session-players > li').remove();
             $('#game-session').css('display', 'none');
-
-            //proxy.server.playerJoined(
-            //{
-            //    Nick: proxy.state.name,
-            //    Id: $.connection.gameHub.connection.id,
-            //    Avatar: proxy.state.avatar
-            //});
         }
         
         proxy.client.sendAnswer = function (id, answer) {
-            $('#' + id).fadeOut(answer == true ? 0 : 200);
+
+            if (answer) {
+                $('#invitation-container').fadeOut(200).html('');
+            }
+            else {
+                $('#' + id).fadeOut(answer == true ? 0 : 200);
+            }
+
             proxy.server.sendInviteAnswer({
                 InviteId: id,
                 Accepted: answer

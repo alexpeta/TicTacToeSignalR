@@ -60,6 +60,19 @@ namespace TicTacToeSignalR
                     _invitations.TryTake(out result);                  
                 }
             }
+            //clear all other invites for the current player
+            if (result != null)
+            {
+                Invitation aux = null;
+                foreach (Invitation inv in _invitations)
+                {
+                    if (inv.To.Equals(result.To))
+                    {
+                        _invitations.TryTake(out aux);
+                        aux = null;
+                    }
+                }
+            }
             return result;
         }
 
