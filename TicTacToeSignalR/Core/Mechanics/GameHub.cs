@@ -74,7 +74,9 @@ namespace TicTacToeSignalR.Core.Mechanics
                         Player p2 = null;
                         _lobby.TryRemove(game.Player1.Id, out p1);
                         _lobby.TryRemove(game.Player2.Id, out p2);
-                        
+
+                        GetConnectedPlayers(p1.Nick, p2.Nick);
+
                         //start the game for the players.
                         Clients.Client(game.Player1.Id.ToString()).clientRenderBoard(GameManager.GetBoardMarkup(game.GameId, game.Player1.Id), game);
                         Clients.Client(game.Player2.Id.ToString()).clientRenderBoard(GameManager.GetBoardMarkup(game.GameId, game.Player2.Id), game);
@@ -122,10 +124,17 @@ namespace TicTacToeSignalR.Core.Mechanics
             GameManager.AddGameMove(gameId, move, playerId);
         }
 
-        public void GetConnectedPlayers()
+        public void GetConnectedPlayers(params string[] exceptions)
         {
             var playersList = _lobby.Values.OrderBy(p => p.Nick);
-            Clients.All.refreshPlayersList(playersList);
+            if (exceptions != null)
+            {
+                Clients.AllExcept(exceptions).refreshPlayersList(playersList);
+            }
+            else
+            {
+                Clients.All.refreshPlayersList(playersList);
+            }
         }
 
         public void QuitToLobby(Guid gameId,string playerWhoQuitsId)
